@@ -1,5 +1,5 @@
 // Example using Express.js
-const express = require("express");
+import express from "express";
 const app = express();
 
 // Example defining a route in Express
