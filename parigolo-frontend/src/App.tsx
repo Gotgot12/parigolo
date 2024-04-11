@@ -6,6 +6,7 @@ import Login from './components/Login/Login';
 import BetList from './components/BetList/BetList';
 import BetDetail from './components/BetDetail/BetDetail';
 import CreateRoom from './components/CreateRoom/CreateRoom';
+import Welcome from './components/Welcome/Welcome';
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/bets" element={<BetList />} />
         <Route path="/bet/:id" element={<BetDetail />} />
+        <Route path="/welcome" element={<Welcome />} />
+
       </Routes>
     </Router>
   );
