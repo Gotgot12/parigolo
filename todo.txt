@@ -1,0 +1,11 @@
+Back :
+- Schéma de BDD
+- Module d'authentification
+- 
+
+Front :
+- Page de login / inscription
+- Page un groupe de joueur
+- Page ajouter un pari à la main
+- Page résultat du pari
+- Page leaderboard
