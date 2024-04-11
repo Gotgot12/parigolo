@@ -1,0 +1,20 @@
+version: '3'
+services:
+  frontend:
+    build: ./parigolo-frontend
+    ports:
+      - '80:80'
+  backend:
+    build: ./parigolo-backend
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    environment:
+      - MONGO_URL=mongodb://db:27017/betting
+  db:
+    image: mongo:4.4.6-bionic
+    volumes:
+      - mongodb_data:/data/db
+volumes:
+  mongodb_data:
