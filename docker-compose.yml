@@ -11,10 +11,15 @@ services:
     depends_on:
       - db
     environment:
-      - MONGO_URL=mongodb://db:27017/betting
+      - DATABASE_URL=mysql://parigolo:ParigoloPassword@db:3306/parigolodb
   db:
-    image: mongo:4.4.6-bionic
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=ParigoloRootPassword
+      - MYSQL_DATABASE=parigolodb
+      - MYSQL_USER=parigolo
+      - MYSQL_PASSWORD=ParigoloPassword
     volumes:
-      - mongodb_data:/data/db
+      - mysql_data:/var/lib/mysql
 volumes:
-  mongodb_data:
+  mysql_data:
