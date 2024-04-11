@@ -3,11 +3,28 @@ import React, { useState } from 'react';
 function CreateRoom() {
   const [roomName, setRoomName] = useState('');
 
-  const handleRoomCreation = (event: React.FormEvent) => {
+  const handleRoomCreation = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Here you can handle the room creation
-    console.log(`Room "${roomName}" has been created.`);
-    setRoomName('');
+
+    try {
+      const response = await fetch('http://localhost:8000/rooms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: roomName }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Room creation failed');
+      }
+
+      const room = await response.json();
+      console.log(`Room "${room.name}" has been created.`);
+      setRoomName('');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
