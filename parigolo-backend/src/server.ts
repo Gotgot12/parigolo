@@ -5,11 +5,13 @@ import Bet from './models/bet';
 import Choice from './models/choice';
 import Room from './models/room';
 import { sequelize } from './database';
+import cors from 'cors';
 
 const app = express();
 
 // Middleware for parsing JSON bodies
 app.use(bodyParser.json());
+app.use(cors());
 
 // Define relationships
 Room.hasMany(Person);
