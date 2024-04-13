@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../../apiConfig';
 
 function CreateRoom() {
   const [roomName, setRoomName] = useState('');
@@ -7,7 +8,8 @@ function CreateRoom() {
     event.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8000/rooms', {
+      console.log(`Creating room "${roomName}"... on ${API_BASE_URL}/rooms`);
+      const response = await fetch(`${API_BASE_URL}/rooms`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
