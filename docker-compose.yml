@@ -3,22 +3,34 @@ services:
   frontend:
     build: ./parigolo-frontend
     ports:
-      - '80:80'
+      - '${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}'
+    expose:
+      - ${FRONTEND_CONTAINER_PORT}
+    environment:
+      - BACKEND_PORT=${BACKEND_HOST_PORT}
   backend:
     build: ./parigolo-backend
     ports:
-      - '8000:8000'
+      - '${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}'
+    expose:
+      - ${BACKEND_CONTAINER_PORT}
     depends_on:
       - db
     environment:
-      - DATABASE_URL=mysql://parigolo:ParigoloPassword@db:3306/parigolodb
+      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:${MYSQL_HOST_PORT}/${MYSQL_DATABASE}
+      - PORT=${BACKEND_CONTAINER_PORT}
   db:
     image: mysql:5.7
     environment:
-      - MYSQL_ROOT_PASSWORD=ParigoloRootPassword
-      - MYSQL_DATABASE=parigolodb
-      - MYSQL_USER=parigolo
-      - MYSQL_PASSWORD=ParigoloPassword
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_TCP_PORT=${MYSQL_CONTAINER_PORT}
+    ports:
+      - ${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}
+    expose:
+      - ${MYSQL_CONTAINER_PORT}
     volumes:
       - mysql_data:/var/lib/mysql
 volumes:
