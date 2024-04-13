@@ -1,7 +1,7 @@
-import { Box, Button, TextField } from "@mui/material";
-import axios from "axios";
 import React from "react";
+import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
+import axios from "axios";
 
 const Auth = () => {
   const [pseudoLogin, setPseudoLogin] = useState<string>("");
