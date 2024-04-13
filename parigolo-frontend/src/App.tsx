@@ -6,6 +6,7 @@ import BetDetail from './components/BetDetail/BetDetail';
 import CreateRoom from './components/CreateRoom/CreateRoom';
 import Welcome from './components/Welcome/Welcome';
 import Leaderboard from './components/Leaderboard/Leaderboard';
+import React from 'react';
 
 function App() {
   return (
