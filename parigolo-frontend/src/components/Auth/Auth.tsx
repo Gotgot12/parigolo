@@ -1,4 +1,6 @@
 import { Box, Button, TextField } from "@mui/material";
+import axios from "axios";
+import React from "react";
 import { useState } from "react";
 
 const Auth = () => {
@@ -14,6 +16,12 @@ const Auth = () => {
       email: pseudoLogin,
       password: passwordLogin,
     };
+
+    axios.post('/login', {credentials}, {})
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => console.log(error))
   };
 
   const signinEvent = () => {
@@ -21,6 +29,12 @@ const Auth = () => {
       email: pseudoSignin,
       password: passwordSignin,
     };
+
+    axios.post('/signup', {credentials}, {})
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => console.log(error))
   };
 
   const handleKeyDownPasssword = (event: React.KeyboardEvent<HTMLInputElement>) => {

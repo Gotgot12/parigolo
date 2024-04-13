@@ -38,7 +38,7 @@ app.get('/persons', async (req, res) => {
   }
 });
 
-app.post('/persons', async (req, res) => {
+app.post('/signup', async (req, res) => {
   try {
     const newPerson = await Person.create(req.body);
     res.json(newPerson);
@@ -46,6 +46,19 @@ app.post('/persons', async (req, res) => {
     res.status(500).json({ error: err });
   }
 });
+
+app.post('/login', async (req, res) => {
+  const personSearch = await Person.findOne({ where: { pseudo : req.body }})
+  if (personSearch !== null) {
+    if (personSearch.getDataValue('password') === req.body.password) {
+      res.send('login ok')
+    } else {
+      res.status(500).json({error: 'no match'})
+    }
+  } else {
+      res.status(500).json({error: 'no found'})
+  }
+})
 
 // Bet endpoints
 app.get('/bets', async (req, res) => {
