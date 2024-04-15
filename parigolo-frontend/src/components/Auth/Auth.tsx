@@ -1,6 +1,8 @@
-import { Box, Button, TextField } from "@mui/material";
 import React from "react";
+import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router";
 
 const Auth = () => {
   const [pseudoLogin, setPseudoLogin] = useState<string>("");
@@ -10,22 +12,48 @@ const Auth = () => {
   const [passwordSignin, setPasswordSignin] = useState<string>("");
   const [confirmPasswordSignin, setConfirmPasswordSignin] = useState<string>("");
 
+  const navigate = useNavigate();
+
   const loginEvent = () => {
     const credentials = {
-      email: pseudoLogin,
+      pseudo: pseudoLogin,
       password: passwordLogin,
     };
+
+    fetch("http://localhost:8000/login", {
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(credentials)
+    }).then((response) => {
+      console.log(response)
+      if (response.status !== 500 && response.status === 200) {
+        navigate("/")
+      }
+    })
+      .catch((error) => {console.log(error)})
   };
 
   const signinEvent = () => {
     const credentials = {
-      email: pseudoSignin,
+      pseudo: pseudoSignin,
       password: passwordSignin,
     };
+
+    fetch("http://localhost:8000/signup", {
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(credentials)
+    }).then((response) => {
+      console.log(response)
+      if (response.status !== 500 && response.status === 200) {
+        navigate("/")
+      }
+    })
+      .catch((error) => {console.log(error)})
   };
 
   const handleKeyDownPasssword = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       loginEvent();
     }
   }
@@ -96,11 +124,11 @@ const Auth = () => {
             onChange={(e) => setConfirmPasswordSignin(e.target.value)}
           />
           <Button
-            className={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? "!bg-grey" : "!bg-black"}
+            className={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? '!bg-grey' : '!bg-black'}
             variant="contained"
             size="large"
             onClick={signinEvent}
-            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6}
+            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? true : false}
           >
             Confirmer
           </Button>
