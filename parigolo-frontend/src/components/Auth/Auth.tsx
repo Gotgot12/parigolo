@@ -25,7 +25,7 @@ const Auth = () => {
   };
 
   const handleKeyDownPasssword = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       loginEvent();
     }
   }
@@ -96,11 +96,11 @@ const Auth = () => {
             onChange={(e) => setConfirmPasswordSignin(e.target.value)}
           />
           <Button
-            className={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? '!bg-grey' : '!bg-black'}
+            className={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? "!bg-grey" : "!bg-black"}
             variant="contained"
             size="large"
             onClick={signinEvent}
-            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? true : false}
+            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6}
           >
             Confirmer
           </Button>
