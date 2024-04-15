@@ -43,9 +43,8 @@ function Room() {
     };
 
     const handleAddition = () => {
-        setCreatedName("");
-        setCreatedSport("");
-        setCreatedMatch("");
+        setAddedBet("");
+        setAddedScore("");
     };
 
     const handleDeletion = (id: number) => {
