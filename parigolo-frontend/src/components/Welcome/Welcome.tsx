@@ -22,7 +22,7 @@ interface Participant {
 function Welcome() {
 
     const [createdName, setCreatedName] = useState<string>("");
-    const [addedRoom, setAddedRoom] = useState<string>("");
+    const [addedRoom, setAddedRoom] = useState<string>("0");
     const [addedParticipant, setAddedParticipant] = useState<string>("");
     const [bets, setBets] = useState<Bet[]>(
         [{id: 1, name: "Bet 1"},
@@ -38,9 +38,9 @@ function Welcome() {
     );
     const [rooms, setRooms] = useState<Room[]>(
         [
-            { id: 1, name: "Room 1", bets: bets, participants: participants},
-            { id: 2, name: "Room 2", bets: bets, participants: participants},
-            { id: 3, name: "Room 3", bets: bets, participants: participants}
+            { id: 1, name: "Room 1", bets: [], participants: []},
+            { id: 2, name: "Room 2", bets: [], participants: []},
+            { id: 3, name: "Room 3", bets: [], participants: []}
         ]
     );
 
@@ -53,12 +53,20 @@ function Welcome() {
             currentId = lastRoom.id;
         }
         const nextId = currentId + 1;
-        rooms.push({id: nextId, name: createdName, bets: bets, participants: participants});
-        setCreatedName("");
+        rooms.push({id: nextId, name: createdName, bets: [], participants: []});
+        setCreatedName("0");
     };
 
     const handleAddition = () => {
-        setAddedRoom("");
+        const tempRooms = rooms[parseInt(addedRoom)-1]
+        const tempParticipants = tempRooms.participants;
+        const lastParticipant = tempParticipants[tempParticipants.length - 1];
+        let currentId = 0;
+        if (lastParticipant != null) {
+            currentId = lastParticipant.id;
+        }
+        tempParticipants.push({id: currentId, name: addedParticipant})
+        setAddedRoom("0");
         setAddedParticipant("");
     }
 
@@ -126,9 +134,9 @@ function Welcome() {
                         onChange={(e) => setAddedRoom(e.target.value)}
                         className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
                     >
-                        <option value="" disabled>Select the room</option>
+                        <option value="0" disabled>Select the room</option>
                         {rooms.map((room) => (
-                            <option value={room.name}>{room.name}</option>
+                            <option value={room.id}>{room.name}</option>
                         ))};
                     </select>
                     <select
