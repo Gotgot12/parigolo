@@ -3,7 +3,9 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 
-interface Bet {
+type Props = {}
+
+type Bet = {
     id: number;
     name: string;
     sport: string;
@@ -12,7 +14,7 @@ interface Bet {
     status: string;
 }
 
-function Room() {
+const Room = (props: Props) => {
 
     const [createdName, setCreatedName] = useState<string>("");
     const [createdSport, setCreatedSport] = useState<string>("0");

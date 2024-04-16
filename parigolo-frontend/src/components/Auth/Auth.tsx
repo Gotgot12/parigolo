@@ -1,8 +1,8 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router";
+import {AuthContext} from "./AuthContext";
 
 const Auth = () => {
   const [pseudoLogin, setPseudoLogin] = useState<string>("");
@@ -11,6 +11,8 @@ const Auth = () => {
   const [pseudoSignin, setPseudoSignin] = useState<string>("");
   const [passwordSignin, setPasswordSignin] = useState<string>("");
   const [confirmPasswordSignin, setConfirmPasswordSignin] = useState<string>("");
+
+  const {authenticated, setAuthenticated} = useContext(AuthContext)
 
   const navigate = useNavigate();
 
@@ -27,6 +29,7 @@ const Auth = () => {
     }).then((response) => {
       console.log(response)
       if (response.status !== 500 && response.status === 200) {
+        setAuthenticated(true)
         navigate("/")
       }
     })
@@ -46,6 +49,7 @@ const Auth = () => {
     }).then((response) => {
       console.log(response)
       if (response.status !== 500 && response.status === 200) {
+        setAuthenticated(true)
         navigate("/")
       }
     })
@@ -128,13 +132,13 @@ const Auth = () => {
             variant="contained"
             size="large"
             onClick={signinEvent}
-            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? true : false}
+            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6}
           >
             Confirmer
           </Button>
         </Box>
       </Box>
   );
-};
+}
 
 export default Auth;
