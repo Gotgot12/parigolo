@@ -1,9 +1,11 @@
 import React from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import {useAuth} from "../../context/useAuth";
+
+import { UseAuth } from "../context/UseAuth";
 
 const Auth = () => {
+
   const [pseudoLogin, setPseudoLogin] = useState<string>("");
   const [passwordLogin, setPasswordLogin] = useState<string>("");
 
@@ -11,7 +13,7 @@ const Auth = () => {
   const [passwordSignin, setPasswordSignin] = useState<string>("");
   const [confirmPasswordSignin, setConfirmPasswordSignin] = useState<string>("");
 
-  const { loginUser, signinUser } = useAuth();
+  const { loginUser, signinUser } = UseAuth();
 
   const loginEvent = () => {
     loginUser(pseudoLogin, passwordLogin)

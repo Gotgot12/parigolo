@@ -1,11 +1,11 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+
 import {API_BASE_URL} from "../apiConfig";
 
 type User = {
     pseudo: string,
-    password: string
 }
 
 type UserContextType = {
@@ -34,37 +34,41 @@ export const UserProvider = ({ children }: Props) => {
     }, []);
 
     const signinUser = (pseudo: string, password: string) => {
-        const credentials = {
-            pseudo: pseudo,
-            password: password
-        };
         fetch(API_BASE_URL + "/signup", {
             method: "POST",
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(credentials)
+            body: JSON.stringify({
+                pseudo: pseudo,
+                password: password
+            })
         }).then((response) => {
             console.log(response)
             if (response.status !== 500 && response.status === 200) {
-                localStorage.setItem("user", JSON.stringify(credentials));
-                setUser(credentials!);
+                const user = {
+                    pseudo: pseudo
+                }
+                localStorage.setItem("user", JSON.stringify(user));
+                setUser(user!);
                 navigate("/");
             }
         }).catch((error) => {console.log(error)})
     };
 
     const loginUser = (pseudo: string, password: string) => {
-        const credentials = {
-            pseudo: pseudo,
-            password: password,
-        };
         fetch(API_BASE_URL + "/login", {
             method: "POST",
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(credentials)
+            body: JSON.stringify({
+                pseudo: pseudo,
+                password: password,
+            })
         }).then((response) => {
             if (response.status !== 500 && response.status === 200) {
-                localStorage.setItem("user", JSON.stringify(credentials));
-                setUser(credentials!);
+                const user = {
+                    pseudo: pseudo
+                }
+                localStorage.setItem("user", JSON.stringify(user));
+                setUser(user!);
                 navigate("/");
             }
         }).catch((error) => {console.log(error)})
@@ -90,4 +94,4 @@ export const UserProvider = ({ children }: Props) => {
 
 };
 
-export const useAuth = () => React.useContext(UserContext);
+export const UseAuth = () => React.useContext(UserContext);

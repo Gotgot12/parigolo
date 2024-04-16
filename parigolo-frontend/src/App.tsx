@@ -1,7 +1,8 @@
-import "./App.css";
 import { Outlet } from "react-router-dom";
 import React from "react";
-import { UserProvider } from "./context/useAuth";
+
+import "./App.css";
+import { UserProvider } from "./context/UseAuth";
 
 const App = () => {
     return (

@@ -17,14 +17,17 @@ type Participant = {
 const Welcome = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
+
     const [addedRoom, setAddedRoom] = useState<string>("0");
     const [addedParticipant, setAddedParticipant] = useState<string>("");
+
     const [participants] = useState<Participant[]>(
         [{id: 1, name: "Participant 1"},
             {id: 2, name: "Participant 2"},
             {id: 3, name: "Participant 3"}
         ]
     );
+
     const [rooms, setRooms] = useState<Room[]>(
         [
             { id: 1, name: "Room 1", participants: []},
