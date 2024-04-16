@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-type Props = {}
 
 type Room = {
     id: number;
@@ -15,7 +14,7 @@ type Participant = {
     name: string;
 }
 
-const Welcome = (props: Props) => {
+const Welcome = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
     const [addedRoom, setAddedRoom] = useState<string>("0");

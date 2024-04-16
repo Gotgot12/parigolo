@@ -1,8 +1,7 @@
-import React, {useContext} from "react";
+import React from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import {AuthContext} from "./AuthContext";
+import {useAuth} from "../../context/useAuth";
 
 const Auth = () => {
   const [pseudoLogin, setPseudoLogin] = useState<string>("");
@@ -12,52 +11,18 @@ const Auth = () => {
   const [passwordSignin, setPasswordSignin] = useState<string>("");
   const [confirmPasswordSignin, setConfirmPasswordSignin] = useState<string>("");
 
-  const {authenticated, setAuthenticated} = useContext(AuthContext)
-
-  const navigate = useNavigate();
+  const { loginUser, signinUser } = useAuth();
 
   const loginEvent = () => {
-    const credentials = {
-      pseudo: pseudoLogin,
-      password: passwordLogin,
-    };
-
-    fetch("http://localhost:8000/login", {
-      method: "POST",
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(credentials)
-    }).then((response) => {
-      console.log(response)
-      if (response.status !== 500 && response.status === 200) {
-        setAuthenticated(true)
-        navigate("/")
-      }
-    })
-      .catch((error) => {console.log(error)})
+    loginUser(pseudoLogin, passwordLogin)
   };
 
   const signinEvent = () => {
-    const credentials = {
-      pseudo: pseudoSignin,
-      password: passwordSignin,
-    };
-
-    fetch("http://localhost:8000/signup", {
-      method: "POST",
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(credentials)
-    }).then((response) => {
-      console.log(response)
-      if (response.status !== 500 && response.status === 200) {
-        setAuthenticated(true)
-        navigate("/")
-      }
-    })
-      .catch((error) => {console.log(error)})
+    signinUser(pseudoSignin, passwordSignin)
   };
 
   const handleKeyDownPasssword = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       loginEvent();
     }
   }
