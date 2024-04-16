@@ -5,13 +5,7 @@ import { useNavigate } from "react-router-dom";
 interface Room {
     id: number;
     name: string;
-    bets: Bet[]
     participants: Participant[]
-}
-
-interface Bet {
-    id: number;
-    name: string;
 }
 
 interface Participant {
@@ -24,13 +18,7 @@ function Welcome() {
     const [createdName, setCreatedName] = useState<string>("");
     const [addedRoom, setAddedRoom] = useState<string>("0");
     const [addedParticipant, setAddedParticipant] = useState<string>("");
-    const [bets, setBets] = useState<Bet[]>(
-        [{id: 1, name: "Bet 1"},
-            {id: 2, name: "Bet 2"},
-            {id: 3, name: "Bet 3"}
-        ]
-    );
-    const [participants, setParticipants] = useState<Participant[]>(
+    const [participants] = useState<Participant[]>(
         [{id: 1, name: "Participant 1"},
             {id: 2, name: "Participant 2"},
             {id: 3, name: "Participant 3"}
@@ -38,9 +26,9 @@ function Welcome() {
     );
     const [rooms, setRooms] = useState<Room[]>(
         [
-            { id: 1, name: "Room 1", bets: [], participants: []},
-            { id: 2, name: "Room 2", bets: [], participants: []},
-            { id: 3, name: "Room 3", bets: [], participants: []}
+            { id: 1, name: "Room 1", participants: []},
+            { id: 2, name: "Room 2", participants: []},
+            { id: 3, name: "Room 3", participants: []}
         ]
     );
 
@@ -53,7 +41,7 @@ function Welcome() {
             currentId = lastRoom.id;
         }
         const nextId = currentId + 1;
-        rooms.push({id: nextId, name: createdName, bets: [], participants: []});
+        rooms.push({id: nextId, name: createdName, participants: []});
         setCreatedName("0");
     };
 
@@ -86,14 +74,6 @@ function Welcome() {
                     <div key={room.id} className="bg-gray-100 p-4 rounded-md cursor-pointer"
                          onClick={() => handleClick(room.id, room.name)}>
                         <h2 className="text-2xl font-bold mb-4 text-center">{room.name}</h2>
-                        <div className="mb-4">
-                            <h3 className="text-xl font-bold mb-2">Bets :</h3>
-                            <ul>
-                                {room.bets.map((bet) => (
-                                    <li key={bet.id}><span className="mr-2">&#8226;</span> {bet.name}</li>
-                                ))}
-                            </ul>
-                        </div>
                         <div>
                             <h3 className="text-xl font-bold mb-2">Participants :</h3>
                             <ul>

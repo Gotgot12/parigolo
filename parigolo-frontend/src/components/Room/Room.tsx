@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface Bet {
     id: number;
@@ -27,7 +27,6 @@ function Room() {
     );
 
     const location = useLocation();
-    const navigate = useNavigate();
 
     const handleCreation = () => {
         const lastRoom = bets[bets.length - 1];
