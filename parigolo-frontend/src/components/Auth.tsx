@@ -1,5 +1,4 @@
 import React from "react";
-import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
 
 import { UseAuth } from "../context/UseAuth";
@@ -30,82 +29,63 @@ const Auth = () => {
   }
 
   return (
-    <Box className="flex flex-row w-full justify-center items-center h-screen gap-x-8">
-        <Box className="flex flex-col justify-center items-center bg-white rounded-3xl w-1/3 py-10 border border-[#bcbcbc] shadow-xl">
-          <h4 className="text-black text-2xl font-bold text-lg mb-5">
-            Connexion
-          </h4>
-          <TextField
-            className="!mb-4 w-2/3"
-            type="text"
-            id="pseudoLogin"
-            label="Pseudo"
-            variant="outlined"
-            value={pseudoLogin}
-            onChange={(e) => setPseudoLogin(e.target.value)}
-          />
-          <TextField
-            className="!mb-6 w-2/3"
-            type="password"
-            id="passwordLogin"
-            label="Mot de passe"
-            variant="outlined"
-            value={passwordLogin}
-            onChange={(e) => setPasswordLogin(e.target.value)}
-            onKeyDown={handleKeyDownPasssword}
-          />
-          <Button
-            className="!bg-black"
-            variant="contained"
-            size="large"
-            onClick={loginEvent}
-          >
-            Confirmer
-          </Button>
-        </Box>
-        <Box className="flex flex-col justify-center items-center bg-white rounded-3xl w-1/3 py-10 border border-[#bcbcbc] shadow-xl">
-          <h4 className="text-black text-2xl font-bold text-lg mb-5">
-            Inscription
-          </h4>
-          <TextField
-            className="!mb-4 w-2/3"
-            type="text"
-            id="pseudoSignin"
-            label="Pseudo"
-            variant="outlined"
-            value={pseudoSignin}
-            onChange={(e) => setPseudoSignin(e.target.value)}
-          />
-          <TextField
-            className="!mb-6 w-2/3"
-            type="password"
-            id="passwordSignin"
-            label="Mot de passe"
-            variant="outlined"
-            value={passwordSignin}
-            onChange={(e) => setPasswordSignin(e.target.value)}
-          />
-          <TextField
-            className="!mb-6 w-2/3"
-            type="password"
-            id="confirmPasswordSignin"
-            label="Confirmation du mot de passe"
-            variant="outlined"
-            value={confirmPasswordSignin}
-            onChange={(e) => setConfirmPasswordSignin(e.target.value)}
-          />
-          <Button
-            className={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6 ? '!bg-grey' : '!bg-black'}
-            variant="contained"
-            size="large"
-            onClick={signinEvent}
-            disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6}
-          >
-            Confirmer
-          </Button>
-        </Box>
-      </Box>
+      <div className="container mx-auto">
+        <h1 className="text-5xl font-bold mb-10 mt-10 text-center">Welcome</h1>
+        <div className="grid grid-cols-2 gap-4 mb-10">
+          <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
+            <h2 className="text-2xl font-bold mb-4">Login</h2>
+            <input
+                type="text"
+                value={pseudoLogin}
+                onChange={(e) => setPseudoLogin(e.target.value)}
+                placeholder="Enter the pseudo"
+                className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+            />
+            <input
+                type="password"
+                value={passwordLogin}
+                onChange={(e) => setPasswordLogin(e.target.value)}
+                placeholder="Enter the password"
+                className="w-full p-2 border border-gray-200 rounded-md mr-4"
+            />
+            <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+                    onClick={ loginEvent }>
+              Confirm
+            </button>
+          </div>
+          <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
+            <h2 className="text-2xl font-bold mb-4">Signin</h2>
+            <input
+                type="text"
+                value={pseudoSignin}
+                onChange={(e) => setPseudoSignin(e.target.value)}
+                placeholder="Enter the pseudo"
+                className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+            />
+            <input
+                type="password"
+                value={passwordSignin}
+                onChange={(e) => setPseudoSignin(e.target.value)}
+                placeholder="Enter the password"
+                className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+            />
+            <input
+                type="password"
+                value={confirmPasswordSignin}
+                onChange={(e) => setConfirmPasswordSignin(e.target.value)}
+                placeholder="Confirm the password"
+                className="w-full p-2 border border-gray-200 rounded-md mr-4"
+            />
+            <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+                    onClick={signinEvent}
+                    disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6}>
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
   );
+
 }
 
 export default Auth;
