@@ -151,7 +151,7 @@ function Room() {
                     </button>
                 </div>
                 <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Add a results to a bet</h2>
+                    <h2 className="text-2xl font-bold mb-4">Add results to a bet</h2>
                     <select
                         value={addedBet}
                         onChange={(e) => setAddedBet(e.target.value)}
