@@ -17,9 +17,12 @@ const Room = () => {
     const [createdName, setCreatedName] = useState<string>("");
     const [createdSport, setCreatedSport] = useState<string>("0");
     const [createdMatch, setCreatedMatch] = useState<string>("");
+
     const [addedBet, setAddedBet] = useState<string>("0")
     const [addedResults, setAddedResults] = useState<string>("")
+
     const [predictedBet, setPredictedBet] = useState<string>("0")
+
     const [predictedResults, setPredictedResults] = useState<string>("")
     const [bets, setBets] = useState<Bet[]>(
         [
@@ -28,6 +31,7 @@ const Room = () => {
             {id: 3, name: "Bet 3", sport: "Tennis", match: "Alacaraz VS Nadal", results: "", status: ""},
         ]
     );
+
     const rows = [
         {id: 1, pseudo: 'Got', score: 302.2}
     ]

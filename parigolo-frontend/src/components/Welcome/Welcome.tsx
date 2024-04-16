@@ -23,6 +23,7 @@ interface ParticipantRoom {
 const Welcome = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
+
     const [addedRoom, setAddedRoom] = useState<number>();
     const [addedParticipant, setAddedParticipant] = useState<number>();
     const [participants, setParticipants] = useState<Participant[]>([]);
