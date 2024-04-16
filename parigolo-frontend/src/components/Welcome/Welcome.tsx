@@ -46,8 +46,8 @@ function Welcome() {
     };
 
     const handleAddition = () => {
-        const tempRooms = rooms[parseInt(addedRoom)-1]
-        const tempParticipants = tempRooms.participants;
+        const room = rooms[parseInt(addedRoom)-1]
+        const tempParticipants = room.participants;
         const lastParticipant = tempParticipants[tempParticipants.length - 1];
         let currentId = 0;
         if (lastParticipant != null) {
