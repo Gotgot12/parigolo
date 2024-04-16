@@ -1,14 +1,14 @@
 import React from "react";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 
 interface Bet {
     id: number;
     name: string;
     sport: string;
     match: string;
-    score: string;
+    results: string;
     status: string;
 }
 
@@ -18,14 +18,14 @@ function Room() {
     const [createdSport, setCreatedSport] = useState<string>("0");
     const [createdMatch, setCreatedMatch] = useState<string>("");
     const [addedBet, setAddedBet] = useState<string>("0")
-    const [addedScore, setAddedScore] = useState<string>("")
+    const [addedResults, setAddedResults] = useState<string>("")
     const [predictedBet, setPredictedBet] = useState<string>("0")
-    const [predictedScore, setPredictedScore] = useState<string>("")
+    const [predictedResults, setPredictedResults] = useState<string>("")
     const [bets, setBets] = useState<Bet[]>(
         [
-            {id: 1, name: "Bet 1", sport: "Football", match: "PSG VS OM", score: "", status: ""},
-            {id: 2, name: "Bet 2", sport: "Basketball", match: "Bulls VS Jazz", score: "", status: ""},
-            {id: 3, name: "Bet 3", sport: "Tennis", match: "Alacaraz VS Nadal", score: "", status: ""},
+            {id: 1, name: "Bet 1", sport: "Football", match: "PSG VS OM", results: "", status: ""},
+            {id: 2, name: "Bet 2", sport: "Basketball", match: "Bulls VS Jazz", results: "", status: ""},
+            {id: 3, name: "Bet 3", sport: "Tennis", match: "Alacaraz VS Nadal", results: "", status: ""},
         ]
     );
     const rows = [
@@ -41,7 +41,7 @@ function Room() {
             currentId = lastRoom.id;
         }
         const nextId = currentId + 1;
-        bets.push({id: nextId, name: createdName, sport: createdSport, match: createdMatch, score: "", status: ""});
+        bets.push({id: nextId, name: createdName, sport: createdSport, match: createdMatch, results: "", status: ""});
         setCreatedName("");
         setCreatedSport("");
         setCreatedMatch("");
@@ -49,9 +49,9 @@ function Room() {
 
     const handleAddition = () => {
         const bet = bets[parseInt(addedBet)-1]
-        bet.score = addedScore
+        bet.results = addedResults
         setAddedBet("0");
-        setAddedScore("");
+        setAddedResults("");
     };
 
     const handleDeletion = (id: number) => {
@@ -59,9 +59,9 @@ function Room() {
     }
 
     const handlePrediction = () => {
-        console.log(`Prediction | Bet ID = ${predictedBet} & Bet Score = ${predictedScore}`)
+        console.log(`Prediction | Bet ID = ${predictedBet} & Bet Results = ${predictedResults}`)
         setPredictedBet("0")
-        setPredictedScore("")
+        setPredictedResults("")
     }
 
     return (
@@ -105,7 +105,7 @@ function Room() {
                             <ul>
                                 <li key={bet.id}><span className="mr-2">&#8226;</span> Sport : {bet.sport}</li>
                                 <li key={bet.id}><span className="mr-2">&#8226;</span> Match : {bet.match}</li>
-                                <li key={bet.id}><span className="mr-2">&#8226;</span> Score : {bet.score}</li>
+                                <li key={bet.id}><span className="mr-2">&#8226;</span> Results : {bet.results}</li>
                                 <li key={bet.id}><span className="mr-2">&#8226;</span> Status : {bet.status}</li>
                             </ul>
                         </div>
@@ -151,7 +151,7 @@ function Room() {
                     </button>
                 </div>
                 <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Add a score to a bet</h2>
+                    <h2 className="text-2xl font-bold mb-4">Add a results to a bet</h2>
                     <select
                         value={addedBet}
                         onChange={(e) => setAddedBet(e.target.value)}
@@ -164,9 +164,9 @@ function Room() {
                     </select>
                     <input
                         type="text"
-                        value={addedScore}
-                        onChange={(e) => setAddedScore(e.target.value)}
-                        placeholder="Enter the score"
+                        value={addedResults}
+                        onChange={(e) => setAddedResults(e.target.value)}
+                        placeholder="Enter the results"
                         className="w-full p-2 border border-gray-200 rounded-md mr-4"
                     />
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
@@ -189,9 +189,9 @@ function Room() {
                     </select>
                     <input
                         type="text"
-                        value={predictedScore}
-                        onChange={(e) => setPredictedScore(e.target.value)}
-                        placeholder="Enter the score"
+                        value={predictedResults}
+                        onChange={(e) => setPredictedResults(e.target.value)}
+                        placeholder="Enter the results"
                         className="w-full p-2 border border-gray-200 rounded-md mr-4"
                     />
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
