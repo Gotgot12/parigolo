@@ -2,18 +2,19 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Room {
+
+type Room = {
     id: number;
     name: string;
     participants: Participant[]
 }
 
-interface Participant {
+type Participant = {
     id: number;
     name: string;
 }
 
-function Welcome() {
+const Welcome = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
     const [addedRoom, setAddedRoom] = useState<string>("0");
