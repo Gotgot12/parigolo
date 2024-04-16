@@ -6,6 +6,8 @@ import Choice from './models/choice';
 import Room from './models/room';
 import { sequelize } from './database';
 import cors from 'cors';
+import PersonRoom from "./models/person-room";
+import ChoicePerson from "./models/choice-person";
 
 const app = express();
 
@@ -14,8 +16,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Define relationships
-Room.hasMany(Person);
-Person.belongsTo(Room);
+Room.belongsToMany(Person, { through: PersonRoom });
+Person.belongsToMany(Room, { through: PersonRoom });
 
 Room.hasMany(Bet);
 Bet.belongsTo(Room);
@@ -23,8 +25,8 @@ Bet.belongsTo(Room);
 Bet.hasMany(Choice);
 Choice.belongsTo(Bet);
 
-Choice.belongsToMany(Person, { through: 'ChoicePerson' });
-Person.belongsToMany(Choice, { through: 'ChoicePerson' });
+Choice.belongsToMany(Person, { through: ChoicePerson });
+Person.belongsToMany(Choice, { through: ChoicePerson });
 
 sequelize.sync();
 
@@ -42,6 +44,7 @@ app.post('/signup', async (req, res) => {
   try {
     const personSearch = await Person.findOne({ where: { pseudo : req.body.pseudo }})
     if (personSearch === null) {
+      req.body.nbPoints = 0
       const newPerson = await Person.create(req.body);
       console.log(newPerson)
       res.json(newPerson);
@@ -65,6 +68,7 @@ app.post('/login', async (req, res) => {
       res.status(500).json({error: 'no found'})
   }
 })
+
 
 // Bet endpoints
 app.get('/bets', async (req, res) => {
@@ -122,6 +126,27 @@ app.post('/rooms', async (req, res) => {
     res.status(500).json({ error: err });
   }
 });
+
+// Person room
+app.get('/person-room/:personId', async (req, res) => {
+  try {
+    const { personId } = req.params;
+
+    const personRoom = await PersonRoom.findAll({where: {PersonId: personId}})
+    res.json(personRoom);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
+app.post('/person-room', async (req, res) => {
+  try {
+    const newPersonRoom = await PersonRoom.create(req.body);
+    res.json(newPersonRoom);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
 
 // Start the server
 const port = process.env.PORT ?? 3000;
