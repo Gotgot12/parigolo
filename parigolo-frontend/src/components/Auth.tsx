@@ -10,7 +10,6 @@ const Auth = () => {
 
   const [pseudoSignin, setPseudoSignin] = useState<string>("");
   const [passwordSignin, setPasswordSignin] = useState<string>("");
-  const [confirmPasswordSignin, setConfirmPasswordSignin] = useState<string>("");
 
   const { loginUser, signinUser } = UseAuth();
 
@@ -65,20 +64,13 @@ const Auth = () => {
             <input
                 type="password"
                 value={passwordSignin}
-                onChange={(e) => setPseudoSignin(e.target.value)}
+                onChange={(e) => setPasswordSignin(e.target.value)}
                 placeholder="Enter the password"
-                className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-            />
-            <input
-                type="password"
-                value={confirmPasswordSignin}
-                onChange={(e) => setConfirmPasswordSignin(e.target.value)}
-                placeholder="Confirm the password"
                 className="w-full p-2 border border-gray-200 rounded-md mr-4"
             />
-            <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+            <button className={"w-full mt-4 p-2 rounded-md " + (passwordSignin.length > 6 ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600")}
                     onClick={signinEvent}
-                    disabled={passwordSignin !== confirmPasswordSignin || passwordSignin.length < 6}>
+                    disabled={passwordSignin.length < 6}>
               Confirm
             </button>
           </div>
