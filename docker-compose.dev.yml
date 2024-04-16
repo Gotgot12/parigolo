@@ -1,0 +1,48 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./parigolo-frontend
+      dockerfile: Dockerfile-dev
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - BACKEND_PORT=${BACKEND_HOST_PORT}
+    volumes:
+      - frontend_node_modules:/app/node_modules
+      - ./parigolo-frontend:/app
+    ports:
+      - '${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}'
+    expose:
+      - ${FRONTEND_CONTAINER_PORT}
+  backend:
+    build:
+      context: ./parigolo-backend
+      dockerfile: Dockerfile-dev
+    volumes:
+      - backend_node_modules:/app/node_modules
+      - ./parigolo-backend:/app
+    ports:
+      - '${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}'
+    expose:
+      - ${BACKEND_CONTAINER_PORT}
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:${MYSQL_HOST_PORT}/${MYSQL_DATABASE}
+      - PORT=${BACKEND_CONTAINER_PORT}
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_TCP_PORT=${MYSQL_CONTAINER_PORT}
+    ports:
+      - ${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:
+  frontend_node_modules:
+  backend_node_modules:
