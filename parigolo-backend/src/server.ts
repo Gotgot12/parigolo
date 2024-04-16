@@ -149,5 +149,5 @@ app.post('/person-room', async (req, res) => {
 })
 
 // Start the server
-const port = process.env.PORT ?? 3000;
+const port = process.env.PORT ?? 8000;
 app.listen(port, () => console.log(`Server is running on port ${port}`));

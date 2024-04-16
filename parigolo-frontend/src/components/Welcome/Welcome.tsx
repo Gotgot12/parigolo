@@ -3,12 +3,13 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Room {
+
+type Room = {
     id: number;
     name: string;
 }
 
-interface Participant {
+type Participant = {
     id: number;
     pseudo: string;
     nbPoints: number;
@@ -19,7 +20,7 @@ interface ParticipantRoom {
     RoomId: number;
 }
 
-function Welcome() {
+const Welcome = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
     const [addedRoom, setAddedRoom] = useState<number>();
