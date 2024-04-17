@@ -40,6 +40,15 @@ app.get('/persons', async (req, res) => {
   }
 });
 
+app.get('/person', async (req, res) => {
+  try {
+    const person = await Person.findOne({where : {pseudo : req.query.pseudo}});
+    res.json(person);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
 app.post('/signup', async (req, res) => {
   try {
     const personSearch = await Person.findOne({ where: { pseudo : req.body.pseudo }})
@@ -109,14 +118,34 @@ app.post('/choices', async (req, res) => {
 });
 
 // Room endpoints
-app.get('/rooms', async (req, res) => {
+app.get('/rooms/:personId', async (req, res) => {
   try {
-    const rooms = await Room.findAll();
+    const { personId } = req.params;
+    const personRoom = await PersonRoom.findAll({where: {PersonId: personId}})
+
+    const roomsByPerson: number[] = []
+    personRoom.forEach((persRoom) => {
+      roomsByPerson.push(persRoom.RoomId)
+    })
+
+    const rooms = await Room.findAll({where: {id: roomsByPerson}})
     res.json(rooms);
   } catch (err) {
     res.status(500).json({ error: err });
   }
 });
+
+app.get('/room/:roomId', async (req, res) => {
+  try {
+    const { roomId } = req.params;
+
+    const room = await Room.findOne({where: {id: roomId}})
+    res.json(room);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
 
 app.post('/rooms', async (req, res) => {
   try {
@@ -128,11 +157,9 @@ app.post('/rooms', async (req, res) => {
 });
 
 // Person room
-app.get('/person-room/:personId', async (req, res) => {
+app.get('/person-room', async (req, res) => {
   try {
-    const { personId } = req.params;
-
-    const personRoom = await PersonRoom.findAll({where: {PersonId: personId}})
+    const personRoom = await PersonRoom.findAll()
     res.json(personRoom);
   } catch (err) {
     res.status(500).json({ error: err });

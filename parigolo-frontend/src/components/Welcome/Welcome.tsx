@@ -7,15 +7,17 @@ import { useNavigate } from "react-router-dom";
 type Room = {
     id: number;
     name: string;
+    participants?: Participant[]
 }
 
 type Participant = {
     id: number;
     pseudo: string;
     nbPoints: number;
+    rooms?: Room
 }
 
-interface ParticipantRoom {
+type ParticipantRoom = {
     PersonId: number;
     RoomId: number;
 }
@@ -23,7 +25,6 @@ interface ParticipantRoom {
 const Welcome = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
-
     const [addedRoom, setAddedRoom] = useState<number>();
     const [addedParticipant, setAddedParticipant] = useState<number>();
     const [participants, setParticipants] = useState<Participant[]>([]);
@@ -31,36 +32,51 @@ const Welcome = () => {
     const [participantRoom, setParticipantRoom] = useState<ParticipantRoom[]>([]);
 
     const [rooms, setRooms] = useState<Room[]>([]);
+    
+    const [person, setPerson] = useState<Participant>();
 
     const navigate = useNavigate();
 
     useEffect(() => {    
+        const user = localStorage.getItem("user");
+        if (user) {
+            axios.get(`/person/?pseudo=${JSON.parse(user).pseudo}`)
+            .then((response) => {
+                console.log(response)
+                setPerson(response.data)
+                
+                axios.get(`/rooms/${response.data?.id}`)
+                    .then((response) => {
+                        setRooms(response.data)
+                        console.log(response)
+                    })
+                    .catch((error) => console.log(error))
+
+                axios.get(`/person-room`)
+                    .then((response) => {
+                        console.log(response.data)
+                        setParticipantRoom(response.data)
+                    })
+                    .catch((error) => console.log(error))
+            })
+            .catch((error) => console.log(error))
+
         axios.get("/persons")
             .then((response) => {
                 setParticipants(response.data)
                 console.log(response.data)
             })
             .catch((error) => console.log(error))
-
-        axios.get("/rooms")
-            .then((response) => {
-                setRooms(response.data)
-                console.log(response.data)
-            })
-            .catch((error) => console.log(error))
-        
-        axios.get("/person-room/1")
-            .then((response) => {
-                setParticipantRoom(response.data)
-                console.log(response.data)
-            })
-            .catch((error) => console.log(error))
-    }, [setParticipants, setRooms, setParticipantRoom])
+        }
+    }, [])
 
     const handleCreation = () => {
         axios.post('/rooms', {name: createdName})
             .then((response) => {
                 console.log(response)
+                axios.post('/person-room', {PersonId: person?.id, RoomId: response.data.id})
+                    .then((response) => console.log(response))
+                    .catch((error) => console.log(error))
                 setCreatedName("")
             })
             .catch((error) => console.log(error))
@@ -93,7 +109,7 @@ const Welcome = () => {
                         <div>
                             <h3 className="text-xl font-bold mb-2">Participants :</h3>
                             <ul>
-                                {participantRoom.map((participantRoom) => (
+                                {participantRoom.filter((partRoom) => partRoom.RoomId === room.id).map((participantRoom) => (
                                     <li key={participantRoom.PersonId}><span className="mr-2">&#8226;</span> {participants.find((participant) => participant.id === participantRoom.PersonId)?.pseudo}</li>
                                 ))}
                             </ul>
@@ -150,6 +166,9 @@ const Welcome = () => {
                             onClick={handleAddition}>
                         Confirm
                     </button>
+                </div>
+                <div>
+                    <button onClick={() => navigate('/logout')}>Se déconnecter</button>
                 </div>
             </div>
         </div>
