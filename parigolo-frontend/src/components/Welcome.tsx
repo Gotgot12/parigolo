@@ -102,7 +102,9 @@ const Welcome = () => {
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">Welcome</h1>
+            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">
+                Welcome {person?.pseudo}
+            </h1>            
             <div className="grid grid-cols-3 gap-4 mb-10">
                 {rooms?.map((room) => (
                     <div key={room.id} className="bg-gray-100 p-4 rounded-md cursor-pointer"
@@ -168,9 +170,6 @@ const Welcome = () => {
                             onClick={handleAddition}>
                         Confirm
                     </button>
-                </div>
-                <div>
-                    <button onClick={() => navigate('/logout')}>Se déconnecter</button>
                 </div>
             </div>
         </div>
