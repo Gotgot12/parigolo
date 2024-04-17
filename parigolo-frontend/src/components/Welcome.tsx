@@ -37,10 +37,10 @@ const Welcome = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {    
+    useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            axios.get(`/person/?pseudo=${JSON.parse(user).pseudo}`)
+            axios.get(`/person/${JSON.parse(user).pseudo}`)
             .then((response) => {
                 console.log(response)
                 setPerson(response.data)
@@ -71,10 +71,13 @@ const Welcome = () => {
     }, [])
 
     const handleCreation = () => {
-        axios.post('/rooms', {name: createdName})
+        axios.post("/rooms", {name: createdName})
             .then((response) => {
                 console.log(response)
-                axios.post('/person-room', {PersonId: person?.id, RoomId: response.data.id})
+                axios.post("/person-room", {PersonId: person?.id, RoomId: response.data.id})
+                    .then((response) => console.log(response))
+                    .catch((error) => console.log(error))
+                axios.post("/leaderboards", {PersonId: person?.id, RoomId: response.data.id, score: 0})
                     .then((response) => console.log(response))
                     .catch((error) => console.log(error))
                 setCreatedName("")
@@ -85,7 +88,10 @@ const Welcome = () => {
     };
 
     const handleAddition = () => {
-        axios.post('/person-room', {PersonId: addedParticipant, RoomId: addedRoom})
+        axios.post("/person-room", {PersonId: addedParticipant, RoomId: addedRoom})
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error))
+        axios.post("/leaderboards", {PersonId: addedParticipant, RoomId: addedRoom, score: 0})
             .then((response) => console.log(response))
             .catch((error) => console.log(error))
         setAddedRoom(0)
@@ -170,7 +176,7 @@ const Welcome = () => {
                     </button>
                 </div>
                 <div>
-                    <button onClick={() => navigate('/logout')}>Se déconnecter</button>
+                    <button onClick={() => navigate("/logout")}>Se déconnecter</button>
                 </div>
             </div>
         </div>

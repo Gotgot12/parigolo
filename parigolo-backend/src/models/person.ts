@@ -1,15 +1,35 @@
-import { DataTypes } from "sequelize";
+import {DataTypes, Model} from "sequelize";
 import { sequelize } from "../database";
 
-const Person = sequelize.define('Person', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  pseudo: DataTypes.STRING,
-  password: DataTypes.STRING,
-  nbPoints: DataTypes.FLOAT,
-});
+interface PersonAttributes {
+  id: number;
+  pseudo: string;
+  password: string;
+  nbPoints: number;
+}
+
+class Person extends Model<PersonAttributes> implements PersonAttributes {
+  public id!: number;
+  public pseudo!: string;
+  public password!: string;
+  public nbPoints!: number;
+}
+
+Person.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      pseudo: DataTypes.STRING,
+      password: DataTypes.STRING,
+      nbPoints: DataTypes.FLOAT
+    },
+    {
+      sequelize,
+      modelName: 'Person',
+    }
+);
 
 export default Person;
