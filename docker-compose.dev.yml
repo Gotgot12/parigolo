@@ -12,6 +12,8 @@ services:
       - ./parigolo-frontend:/app
     ports:
       - '${FRONTEND_HOST_PORT}:3000'
+    expose:
+      - 3000
   backend:
     build:
       context: ./parigolo-backend

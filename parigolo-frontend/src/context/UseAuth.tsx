@@ -25,6 +25,14 @@ export const UserProvider = ({ children }: Props) => {
     const [user, setUser] = useState<User | null>(null);
     const [isReady, setIsReady] = useState(false);
 
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+        if (user) {
+            setUser(JSON.parse(user));
+        }
+        setIsReady(true);
+    }, []);
+
     const signinUser = (pseudo: string, password: string) => {
         fetch(API_BASE_URL + "/signup", {
             method: "POST",
