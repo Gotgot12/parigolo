@@ -3,9 +3,7 @@ services:
   frontend:
     build: ./parigolo-frontend
     ports:
-      - '${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}'
-    expose:
-      - ${FRONTEND_CONTAINER_PORT}
+      - '${FRONTEND_HOST_PORT}:3000'
     environment:
       - BACKEND_PORT=${BACKEND_HOST_PORT}
   backend:
