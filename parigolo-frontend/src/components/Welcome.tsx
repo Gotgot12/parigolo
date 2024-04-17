@@ -1,4 +1,4 @@
-import axios from "../../axios/axios";
+import axios from "../axios/axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -78,6 +78,8 @@ const Welcome = () => {
                     .then((response) => console.log(response))
                     .catch((error) => console.log(error))
                 setCreatedName("")
+                setRooms(prevRooms => [...prevRooms, response.data]) // Update rooms state with the new room
+
             })
             .catch((error) => console.log(error))
     };
