@@ -46,6 +46,7 @@ const Auth = () => {
                 onChange={(e) => setPasswordLogin(e.target.value)}
                 placeholder="Enter the password"
                 className="w-full p-2 border border-gray-200 rounded-md mr-4"
+                onKeyDown={handleKeyDownPasssword}
             />
             <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
                     onClick={ loginEvent }>

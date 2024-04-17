@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
+import {API_BASE_URL} from "../apiConfig";
 import axios from "axios";
 
 type User = {
@@ -38,7 +39,7 @@ export const UserProvider = ({ children }: Props) => {
             pseudo: pseudo,
             password: password
         }
-        axios.post("/signup", data)
+        axios.post(API_BASE_URL + "/signup", data)
             .then((response) => {
                 console.log(response)
                 if (response.status !== 500 && response.status === 200) {
@@ -58,7 +59,7 @@ export const UserProvider = ({ children }: Props) => {
             pseudo: pseudo,
             password: password,
         };
-        axios.post("/login", data)
+        axios.post(API_BASE_URL + "/login", data)
             .then((response) => {
                 if (response.status !== 500 && response.status === 200) {
                     const user = {
