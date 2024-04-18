@@ -26,10 +26,18 @@ type Choice = {
     BetId: number;
 }
 
+
+type Leaderboard = {
+    id: number;
+    personPseudo: string;
+    score: number;
+    PersonId: number;
+    RoomId: number;
+}
+
 type Participant = {
     id: number;
     pseudo: string;
-    nbPoints: number;
     rooms?: Room
 }
 
@@ -52,9 +60,7 @@ const Room = () => {
 
     const [person, setPerson] = useState<Participant>();
 
-    const rows = [
-        {id: 1, pseudo: 'Got', score: 302.2}
-    ]
+    const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
 
     useEffect(() => {
         const user = localStorage.getItem("user");
@@ -79,6 +85,12 @@ const Room = () => {
             })
             .catch((error) => console.log(error))
         
+        axios.get(`/leaderboards/${location.state.id}`)
+            .then((response) => {
+                console.log(response.data)
+                setLeaderboard(response.data)
+            })
+            .catch((error) => console.log(error))
     }, [])
 
     const handleCreation = () => {
@@ -100,9 +112,46 @@ const Room = () => {
     };
 
     const handleAddition = () => {
-        const bet = bets[parseInt(addedBet)-1]
-        setAddedBet("0");
-        setAddedResults("");
+        const currentBet = bets.find((bet) => bet.id === parseInt(addedBet))
+        if (currentBet) {
+            axios.get(`/choices/bet/${currentBet?.id}`)
+                .then((response) => {
+                    console.log(response.data)
+                    const choices: Choice[] = response.data
+                    choices.map((choice) => {
+                        axios.get(`/choice-person/choice/${choice.id}`)
+                        .then((response) => {
+                            console.log(response.data)
+                            console.log(leaderboard)
+                            const currentPersonLeaderboard = leaderboard.find((leader) => leader.PersonId === response.data.PersonId)
+                            console.log(currentPersonLeaderboard)
+                            if (choice.name === addedResults) {
+                                choice.isWin = 1
+                                currentPersonLeaderboard!.score += 10;
+                            } else {
+                                choice.isWin = 0
+                                currentPersonLeaderboard!.score -= 10;
+                            }
+                            axios.put(`/choices/${choice.id}`, choice)
+                                .then((response) => console.log(response.data))
+                                .catch((error) => console.log(error))
+                            
+                            axios.put(`/leaderboards/${currentPersonLeaderboard?.id}`, currentPersonLeaderboard)
+                                .then((response) => console.log(response))
+                                .catch((error) => console.log(error)) 
+                        })
+                        .catch((error) => console.log(error))
+                    })
+                })
+                .catch((error) => console.log(error))
+            currentBet.isEnded = true
+            currentBet.isClosed = true
+            axios.put(`/bets/${currentBet.id}`, currentBet)
+                .then((response) => console.log(response))
+                .catch((error) => console.log(error))
+            setAddedBet("0");
+            setAddedResults("");
+        }
     };
 
     const handleDeletion = (id: number) => {
@@ -148,14 +197,14 @@ const Room = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.map((row, position) => (
+                                {leaderboard.map((row, position) => (
                                     <TableRow
                                         key={row.id}
                                     >
                                         <TableCell align="center" component="th" scope="row" style={{ width: '33.33%' }}>
                                             {position}
                                         </TableCell>
-                                        <TableCell align="center" style={{ width: '33.33%' }}>{row.pseudo}</TableCell>
+                                        <TableCell align="center" style={{ width: '33.33%' }}>{row.personPseudo}</TableCell>
                                         <TableCell align="center" style={{ width: '33.33%' }}>{row.score}</TableCell>
                                     </TableRow>
                                 ))}

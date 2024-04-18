@@ -14,7 +14,6 @@ type Room = {
 type Participant = {
     id: number;
     pseudo: string;
-    nbPoints: number;
     rooms?: Room
 }
 
@@ -87,7 +86,6 @@ const Welcome = () => {
                     ...response.data, participants: [{
                         id: person?.id,
                         pseudo: person?.pseudo,
-                        nbPoints: 0
                     } as Participant], ownerId: person?.id
                 } as Room]);
             })

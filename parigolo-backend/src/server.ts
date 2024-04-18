@@ -61,7 +61,6 @@ app.post("/signup", async (req, res) => {
   try {
     const personSearch = await Person.findOne({ where: { pseudo : req.body.pseudo }})
     if (personSearch === null) {
-      req.body.nbPoints = 0
       const newPerson = await Person.create(req.body);
       console.log(newPerson)
       res.json(newPerson);
@@ -116,6 +115,16 @@ app.post('/bets', async (req, res) => {
   }
 });
 
+app.put(`/bets/:id`, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedBet = await Bet.update(req.body, {where : {id: id }});
+    res.json(updatedBet);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 // Choice endpoints
 app.get("/choices", async (_req, res) => {
   try {
@@ -144,10 +153,30 @@ app.get("/choices/:personId", async (req, res) => {
   }
 });
 
+app.get(`/choices/bet/:betId`, async (req, res) => {
+  try {
+    const { betId } = req.params;
+    const choicesBet = await Choice.findAll({where: {BetId: betId}})
+    res.json(choicesBet);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
 app.post("/choices", async (req, res) => {
   try {
     const newChoice = await Choice.create(req.body);
     res.json(newChoice);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+app.put(`/choices/:id`, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedChoice = await Choice.update(req.body, {where : {id: id }});
+    res.json(updatedChoice);
   } catch (err) {
     res.status(500).json({ error: err });
   }
@@ -158,6 +187,17 @@ app.get('/choice-person/:personId', async (req, res) => {
     const { personId } = req.params;
 
     const choicePerson = await ChoicePerson.findAll({where: {PersonId: personId}});
+    res.json(choicePerson);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
+app.get('/choice-person/choice/:choiceId', async (req, res) => {
+  try {
+    const { choiceId } = req.params;
+
+    const choicePerson = await ChoicePerson.findOne({where: {ChoiceId: choiceId}});
     res.json(choicePerson);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -259,7 +299,7 @@ app.get("/leaderboards/:roomId", async (req, res) => {
       if (person != null) {
         personPseudo = person.pseudo
       }
-      temp_leaderboards.push({id: leaderboard.id, personPseudo: personPseudo, score: leaderboard.score})
+      temp_leaderboards.push({id: leaderboard.id, personPseudo: personPseudo, score: leaderboard.score, RoomId: parseInt(roomId), PersonId: person!.id})
     }
     res.json(temp_leaderboards);
   } catch (err) {
@@ -289,7 +329,9 @@ app.put("/leaderboards/:id/", async (req, res) => {
 type TempLeaderboard = {
   id: number,
   personPseudo: string,
-  score: number
+  score: number,
+  PersonId: number,
+  RoomId: number
 }
 
 // Start the server
