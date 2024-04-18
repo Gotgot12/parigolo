@@ -46,6 +46,7 @@ const Auth = () => {
                 onChange={(e) => setPasswordLogin(e.target.value)}
                 placeholder="Enter the password"
                 className="w-full p-2 border border-gray-200 rounded-md mr-4"
+                onKeyDown={handleKeyDownPasssword}
             />
             <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
                     onClick={ loginEvent }>
@@ -67,6 +68,7 @@ const Auth = () => {
                 onChange={(e) => setPasswordSignin(e.target.value)}
                 placeholder="Enter the password"
                 className="w-full p-2 border border-gray-200 rounded-md mr-4"
+                onKeyDown={handleKeyDownPasssword}
             />
             <button className={"w-full mt-4 p-2 rounded-md " + (passwordSignin.length > 6 ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600")}
                     onClick={signinEvent}

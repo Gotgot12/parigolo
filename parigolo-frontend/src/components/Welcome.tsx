@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 type Room = {
     id: number;
     name: string;
+    ownerId: number | undefined;
     participants?: Participant[]
 }
 
@@ -32,68 +33,95 @@ const Welcome = () => {
     const [participantRoom, setParticipantRoom] = useState<ParticipantRoom[]>([]);
 
     const [rooms, setRooms] = useState<Room[]>([]);
-    
+
     const [person, setPerson] = useState<Participant>();
 
     const navigate = useNavigate();
 
-    useEffect(() => {    
+    useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            axios.get(`/person/?pseudo=${JSON.parse(user).pseudo}`)
+            axios.get(`/person/${JSON.parse(user).pseudo}`)
             .then((response) => {
-                console.log(response)
-                setPerson(response.data)
+                console.log(response);
+                setPerson(response.data);
                 
                 axios.get(`/rooms/${response.data?.id}`)
                     .then((response) => {
-                        setRooms(response.data)
-                        console.log(response)
+                        setRooms(response.data);
+                        console.log(response);
                     })
-                    .catch((error) => console.log(error))
+                    .catch((error) => console.log(error));
 
                 axios.get(`/person-room`)
                     .then((response) => {
                         console.log(response.data)
                         setParticipantRoom(response.data)
                     })
-                    .catch((error) => console.log(error))
+                    .catch((error) => console.log(error));
             })
-            .catch((error) => console.log(error))
+            .catch((error) => console.log(error));
 
         axios.get("/persons")
             .then((response) => {
-                setParticipants(response.data)
-                console.log(response.data)
+                setParticipants(response.data);
+                console.log(response.data);
             })
-            .catch((error) => console.log(error))
+            .catch((error) => console.log(error));
         }
     }, [])
 
     const handleCreation = () => {
-        axios.post('/rooms', {name: createdName})
+        axios.post("/rooms", { name: createdName, ownerId: person?.id })
             .then((response) => {
-                console.log(response)
-                axios.post('/person-room', {PersonId: person?.id, RoomId: response.data.id})
+                console.log(response);
+                axios.post("/person-room", {PersonId: person?.id, RoomId: response.data.id})
                     .then((response) => console.log(response))
                     .catch((error) => console.log(error))
-                setCreatedName("")
-                setRooms(prevRooms => [...prevRooms, response.data]) // Update rooms state with the new room
-
+                axios.post("/leaderboards", {PersonId: person?.id, RoomId: response.data.id, score: 0})
+                    .then((response) => console.log(response))
+                    .catch((error) => console.log(error))
+                setCreatedName("");
+                setParticipantRoom((prevParticipantRoom: ParticipantRoom[]) => [...prevParticipantRoom, { PersonId: person?.id, RoomId: response.data.id } as ParticipantRoom]);
+                setRooms((prevRooms: Room[]) => [...prevRooms, {
+                    ...response.data, participants: [{
+                        id: person?.id,
+                        pseudo: person?.pseudo,
+                        nbPoints: 0
+                    } as Participant], ownerId: person?.id
+                } as Room]);
             })
-            .catch((error) => console.log(error))
+            .catch((error) => console.log(error));
     };
 
     const handleAddition = () => {
-        axios.post('/person-room', {PersonId: addedParticipant, RoomId: addedRoom})
+        axios.post("/person-room", {PersonId: addedParticipant, RoomId: addedRoom})
+            .then((response) => {
+                console.log(response);
+                setParticipantRoom((prevParticipantRoom: ParticipantRoom[]) => [...prevParticipantRoom, { PersonId: addedParticipant, RoomId: addedRoom } as ParticipantRoom]);
+                setRooms((prevRooms: Room[]) => prevRooms.map(room => {
+                    if (room.id === addedRoom) {
+                        const participant = participants?.find(participant => participant.id === addedParticipant);
+                        return { ...room, participants: [...(room.participants || []), ...(participant ? [participant] : [])] };
+                    }
+                    return room;
+                }));
+                setAddedRoom(0);
+                setAddedParticipant(0);
+            })
+            .catch((error) => console.log(error));
+        axios.post("/leaderboards", {PersonId: addedParticipant, RoomId: addedRoom, score: 0})
             .then((response) => console.log(response))
-            .catch((error) => console.log(error))
-        setAddedRoom(0)
-        setAddedParticipant(0);
+            .catch((error) => console.log(error));
     }
 
     const handleDeletion = (id: number) => {
-        setRooms(rooms?.filter(room => room.id !== id));
+        axios.delete(`/rooms/${id}`, { data: { ownerId: person?.id } })
+            .then((response) => {
+                console.log(response);
+                setRooms(rooms?.filter(room => room.id !== id));
+            })
+            .catch((error) => console.log(error));
     }
 
     const handleClick = (id: number) => {
@@ -102,26 +130,31 @@ const Welcome = () => {
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">Welcome</h1>
+            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">
+                Welcome {person?.pseudo}
+            </h1>
             <div className="grid grid-cols-3 gap-4 mb-10">
                 {rooms?.map((room) => (
                     <div key={room.id} className="bg-gray-100 p-4 rounded-md cursor-pointer"
                          onClick={() => handleClick(room.id)}>
                         <h2 className="text-2xl font-bold mb-4 text-center">{room.name}</h2>
+                        <h3 className="text-xl font-bold mb-2">Owner : {participants.find(participant => participant.id === room.ownerId)?.pseudo}</h3>
                         <div>
-                            <h3 className="text-xl font-bold mb-2">Participants :</h3>
+                            <h3 className="text-xl font-bold mb-2">Players :</h3>
                             <ul>
                                 {participantRoom.filter((partRoom) => partRoom.RoomId === room.id).map((participantRoom) => (
                                     <li key={participantRoom.PersonId}><span className="mr-2">&#8226;</span> {participants.find((participant) => participant.id === participantRoom.PersonId)?.pseudo}</li>
                                 ))}
                             </ul>
                         </div>
-                        <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletion(room.id);
-                        }}>
-                            Delete
-                        </button>
+                        {room.ownerId === person?.id && (
+                            <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeletion(room.id);
+                            }}>
+                                Delete
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>
@@ -136,7 +169,7 @@ const Welcome = () => {
                         className="w-full p-2 border border-gray-200 rounded-md mr-4"
                     />
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                            onClick={handleCreation}>
+                        onClick={handleCreation}>
                         Confirm
                     </button>
                 </div>
@@ -149,13 +182,13 @@ const Welcome = () => {
                         defaultValue={0}
                     >
                         <option value={0} disabled>Select the room</option>
-                        {rooms?.map((room) => (
+                        {rooms.filter(room => room.ownerId === person?.id).map((room) => (
                             <option key={room.id} value={room.id}>{room.name}</option>
                         ))};
                     </select>
                     <select
                         value={addedParticipant}
-                        onChange={(e) => {setAddedParticipant(parseInt(e.target.value))}}
+                        onChange={(e) => { setAddedParticipant(parseInt(e.target.value)) }}
                         className="w-full p-2 border border-gray-200 rounded-md mr-4"
                         defaultValue={0}
                     >
@@ -165,12 +198,9 @@ const Welcome = () => {
                         ))};
                     </select>
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                            onClick={handleAddition}>
+                        onClick={handleAddition}>
                         Confirm
                     </button>
-                </div>
-                <div>
-                    <button onClick={() => navigate('/logout')}>Se déconnecter</button>
                 </div>
             </div>
         </div>
