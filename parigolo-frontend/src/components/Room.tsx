@@ -10,13 +10,20 @@ type Bet = {
     sport: string;
     isClosed: boolean;
     isEnded: boolean;
-    roomId: number;
+    RoomId: number;
 }
 
 type Room = {
     id: number;
     name: string;
     participants?: Participant[]
+}
+
+type Choice = {
+    id: number;
+    name: string;
+    isWin: number;
+    BetId: number;
 }
 
 type Participant = {
@@ -39,6 +46,8 @@ const Room = () => {
     const [predictedBet, setPredictedBet] = useState<string>("0")
     const [predictedResults, setPredictedResults] = useState<string>("")
 
+    const [choices, setChoices] = useState<Choice[]>([]);
+
     const [bets, setBets] = useState<Bet[]>([]);
 
     const [person, setPerson] = useState<Participant>();
@@ -51,11 +60,14 @@ const Room = () => {
         const user = localStorage.getItem("user");
         if (user) {
             axios.get(`/person/${JSON.parse(user).pseudo}`)
-            .then((response) => {
+            .then((response: any) => {
                 console.log(response)
                 setPerson(response.data)
-                axios.get(`/choice-person/${response.data.id}`)
-                    .then((response) => console.log(response))
+                axios.get(`/choices/${response.data.id}`)
+                    .then((response) => {
+                        setChoices(response.data)
+                        console.log(response)
+                    })
                     .catch((error) => console.log(error))
             })
         }
@@ -105,10 +117,15 @@ const Room = () => {
         })
             .then((response) => {
                 console.log(response.data)
+                setChoices((previousChoice) => [...previousChoice, response.data])
                 axios.post(`choice-person`, {
                     ChoiceId: response.data.id,
                     PersonId: person?.id
                 })
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((error) => console.log(error))
                 setPredictedBet("0")
                 setPredictedResults("")
             })
@@ -155,6 +172,9 @@ const Room = () => {
                             <h3 className="text-xl font-bold mb-2">Detail</h3>
                             <ul>
                                 <li key={bet.id}><span className="mr-2">&#8226;</span> Sport : {bet.sport}</li>
+                                {choices.find((choice) => choice.BetId === bet.id) && (
+                                    <li><span className="mr-2">&#8226;</span> Prédiction du joueur : {choices.find((choice) => choice.BetId === bet.id)?.name}</li>
+                                )}
                             </ul>
                         </div>
                         <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {

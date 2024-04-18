@@ -126,6 +126,24 @@ app.get("/choices", async (_req, res) => {
   }
 });
 
+// Room endpoints
+app.get("/choices/:personId", async (req, res) => {
+  try {
+    const { personId } = req.params;
+    const choicePerson = await ChoicePerson.findAll({where: {PersonId: personId}})
+
+    const choicesByPerson: number[] = []
+    choicePerson.forEach((choicePers) => {
+      choicesByPerson.push(choicePers.ChoiceId)
+    })
+
+    const choices = await Choice.findAll({where: {id: choicesByPerson}})
+    res.json(choices);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 app.post("/choices", async (req, res) => {
   try {
     const newChoice = await Choice.create(req.body);
