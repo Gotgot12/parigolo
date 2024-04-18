@@ -1,59 +1,94 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import axios from "../axios/axios";
 
 type Bet = {
     id: number;
     name: string;
     sport: string;
-    match: string;
-    results: string;
-    status: string;
+    isClosed: boolean;
+    isEnded: boolean;
+    roomId: number;
+}
+
+type Room = {
+    id: number;
+    name: string;
+    participants?: Participant[]
+}
+
+type Participant = {
+    id: number;
+    pseudo: string;
+    nbPoints: number;
+    rooms?: Room
 }
 
 const Room = () => {
 
+    const location = useLocation();
+
     const [createdName, setCreatedName] = useState<string>("");
     const [createdSport, setCreatedSport] = useState<string>("0");
-    const [createdMatch, setCreatedMatch] = useState<string>("");
 
     const [addedBet, setAddedBet] = useState<string>("0")
     const [addedResults, setAddedResults] = useState<string>("")
 
     const [predictedBet, setPredictedBet] = useState<string>("0")
-
     const [predictedResults, setPredictedResults] = useState<string>("")
-    const [bets, setBets] = useState<Bet[]>(
-        [
-            {id: 1, name: "Bet 1", sport: "Football", match: "PSG VS OM", results: "", status: ""},
-            {id: 2, name: "Bet 2", sport: "Basketball", match: "Bulls VS Jazz", results: "", status: ""},
-            {id: 3, name: "Bet 3", sport: "Tennis", match: "Alacaraz VS Nadal", results: "", status: ""},
-        ]
-    );
+
+    const [bets, setBets] = useState<Bet[]>([]);
+
+    const [person, setPerson] = useState<Participant>();
 
     const rows = [
         {id: 1, pseudo: 'Got', score: 302.2}
     ]
 
-    const location = useLocation();
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+        if (user) {
+            axios.get(`/person/?pseudo=${JSON.parse(user).pseudo}`)
+            .then((response) => {
+                console.log(response)
+                setPerson(response.data)
+                axios.get(`/choice-person/${response.data.id}`)
+                    .then((response) => console.log(response))
+                    .catch((error) => console.log(error))
+            })
+        }
+
+        axios.get(`/bets/${location.state.id}`)
+            .then((response) => {
+                setBets(response.data)
+                console.log(response.data)
+            })
+            .catch((error) => console.log(error))
+        
+    }, [])
 
     const handleCreation = () => {
-        const lastRoom = bets[bets.length - 1];
-        let currentId = 0;
-        if (lastRoom != null) {
-            currentId = lastRoom.id;
-        }
-        const nextId = currentId + 1;
-        bets.push({id: nextId, name: createdName, sport: createdSport, match: createdMatch, results: "", status: ""});
-        setCreatedName("");
-        setCreatedSport("");
-        setCreatedMatch("");
+        axios.post(`/bets`, {
+            name: createdName,
+            sport: createdSport,
+            isClosed: false,
+            isEnded: false,
+            roomId: location.state.id
+        })
+            .then((response) => {
+                setBets((previousBets) => [...previousBets, response.data])
+                setCreatedName("");
+                setCreatedSport("0");
+                console.log(response)
+            })
+            .catch((error) => console.log(error))
+
     };
 
     const handleAddition = () => {
         const bet = bets[parseInt(addedBet)-1]
-        bet.results = addedResults
         setAddedBet("0");
         setAddedResults("");
     };
@@ -63,9 +98,21 @@ const Room = () => {
     }
 
     const handlePrediction = () => {
-        console.log(`Prediction | Bet ID = ${predictedBet} & Bet Results = ${predictedResults}`)
-        setPredictedBet("0")
-        setPredictedResults("")
+        axios.post(`/choices`, {
+            name: predictedResults,
+            isWin: false,
+            betId: parseInt(predictedBet)
+        })
+            .then((response) => {
+                console.log(response.data)
+                axios.post(`choice-person`, {
+                    ChoiceId: response.data.id,
+                    PersonId: person?.id
+                })
+                setPredictedBet("0")
+                setPredictedResults("")
+            })
+            .catch((error) => console.log(error))
     }
 
     return (
@@ -108,9 +155,6 @@ const Room = () => {
                             <h3 className="text-xl font-bold mb-2">Detail</h3>
                             <ul>
                                 <li key={bet.id}><span className="mr-2">&#8226;</span> Sport : {bet.sport}</li>
-                                <li key={bet.id}><span className="mr-2">&#8226;</span> Match : {bet.match}</li>
-                                <li key={bet.id}><span className="mr-2">&#8226;</span> Results : {bet.results}</li>
-                                <li key={bet.id}><span className="mr-2">&#8226;</span> Status : {bet.status}</li>
                             </ul>
                         </div>
                         <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
@@ -142,13 +186,6 @@ const Room = () => {
                         <option value="Basketball">Basketball</option>
                         <option value="Tennis">Tennis</option>
                     </select>
-                    <input
-                        type="text"
-                        value={createdMatch}
-                        onChange={(e) => setCreatedMatch(e.target.value)}
-                        placeholder="Enter the match"
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4"
-                    />
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
                             onClick={handleCreation}>
                         Confirm
@@ -161,9 +198,9 @@ const Room = () => {
                         onChange={(e) => setAddedBet(e.target.value)}
                         className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
                     >
-                        <option value="0" disabled>Select the bet</option>
+                        <option key={0} value="0" disabled>Select the bet</option>
                         {bets.map((bet) => (
-                            <option value={bet.id}>{bet.name}</option>
+                            <option key={bet.id} value={bet.id}>{bet.name}</option>
                         ))};
                     </select>
                     <input
@@ -186,9 +223,9 @@ const Room = () => {
                         onChange={(e) => setPredictedBet(e.target.value)}
                         className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
                     >
-                        <option value="0" disabled>Select the bet</option>
+                        <option key={0} value="0" disabled>Select the bet</option>
                         {bets.map((bet) => (
-                            <option value={bet.id}>{bet.name}</option>
+                            <option key={bet.id} value={bet.id}>{bet.name}</option>
                         ))};
                     </select>
                     <input

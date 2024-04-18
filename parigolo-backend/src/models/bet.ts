@@ -8,8 +8,10 @@ const Bet = sequelize.define('Bet', {
     autoIncrement: true,
   },
   name: DataTypes.STRING,
+  sport: DataTypes.STRING,
   isClosed: DataTypes.BOOLEAN,
   isEnded: DataTypes.BOOLEAN,
+  roomId: DataTypes.INTEGER,
 });
 
 export default Bet;

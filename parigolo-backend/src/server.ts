@@ -89,6 +89,16 @@ app.get('/bets', async (req, res) => {
   }
 });
 
+app.get('/bets/:roomId', async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const bets = await Bet.findAll({where: {RoomId: roomId}})
+    res.json(bets);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 app.post('/bets', async (req, res) => {
   try {
     const newBet = await Bet.create(req.body);
@@ -116,6 +126,26 @@ app.post('/choices', async (req, res) => {
     res.status(500).json({ error: err });
   }
 });
+
+app.get('/choice-person/:personId', async (req, res) => {
+  try {
+    const { personId } = req.params;
+
+    const choicePerson = await ChoicePerson.findAll({where: {PersonId: personId}});
+    res.json(choicePerson);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
+app.post('/choice-person', async (req, res) => {
+  try {
+    const newPersonRoom = await ChoicePerson.create(req.body);
+    res.json(newPersonRoom);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
 
 // Room endpoints
 app.get('/rooms/:personId', async (req, res) => {

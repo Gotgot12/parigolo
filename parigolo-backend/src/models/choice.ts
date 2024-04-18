@@ -10,6 +10,7 @@ const Choice = sequelize.define('Choice', {
   },
   name: DataTypes.STRING,
   isWin: DataTypes.BOOLEAN,
+  betId: DataTypes.INTEGER,
 });
 
 export default Choice;

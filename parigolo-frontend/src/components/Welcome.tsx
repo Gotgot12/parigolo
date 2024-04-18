@@ -96,8 +96,8 @@ const Welcome = () => {
         setRooms(rooms?.filter(room => room.id !== id));
     }
 
-    const handleClick = (id: number, name: string) => {
-        navigate(`/rooms/${id}`, {state: {name: name} });
+    const handleClick = (id: number) => {
+        navigate(`/rooms/${id}`, {state: {id: id} });
     };
 
     return (
@@ -106,7 +106,7 @@ const Welcome = () => {
             <div className="grid grid-cols-3 gap-4 mb-10">
                 {rooms?.map((room) => (
                     <div key={room.id} className="bg-gray-100 p-4 rounded-md cursor-pointer"
-                         onClick={() => handleClick(room.id, room.name)}>
+                         onClick={() => handleClick(room.id)}>
                         <h2 className="text-2xl font-bold mb-4 text-center">{room.name}</h2>
                         <div>
                             <h3 className="text-xl font-bold mb-2">Participants :</h3>
