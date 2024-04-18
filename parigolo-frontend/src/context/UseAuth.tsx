@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import React from "react";
 
 import {API_BASE_URL} from "../apiConfig";
+import axios from "axios";
 
 type User = {
     pseudo: string,
@@ -34,44 +35,42 @@ export const UserProvider = ({ children }: Props) => {
     }, []);
 
     const signinUser = (pseudo: string, password: string) => {
-        fetch(API_BASE_URL + "/signup", {
-            method: "POST",
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                pseudo: pseudo,
-                password: password
-            })
-        }).then((response) => {
-            console.log(response)
-            if (response.status !== 500 && response.status === 200) {
-                const user = {
-                    pseudo: pseudo
+        const data = {
+            pseudo: pseudo,
+            password: password
+        }
+        axios.post(API_BASE_URL + "/signup", data)
+            .then((response) => {
+                console.log(response)
+                if (response.status !== 500 && response.status === 200) {
+                    const user = {
+                        pseudo: pseudo
+                    }
+                    localStorage.setItem("user", JSON.stringify(user));
+                    setUser(user!);
+                    navigate("/");
                 }
-                localStorage.setItem("user", JSON.stringify(user));
-                setUser(user!);
-                navigate("/");
-            }
-        }).catch((error) => {console.log(error)})
+            })
+            .catch((error) => {console.log(error)})
     };
 
     const loginUser = (pseudo: string, password: string) => {
-        fetch(API_BASE_URL + "/login", {
-            method: "POST",
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                pseudo: pseudo,
-                password: password,
-            })
-        }).then((response) => {
-            if (response.status !== 500 && response.status === 200) {
-                const user = {
-                    pseudo: pseudo
+        const data = {
+            pseudo: pseudo,
+            password: password,
+        };
+        axios.post(API_BASE_URL + "/login", data)
+            .then((response) => {
+                if (response.status !== 500 && response.status === 200) {
+                    const user = {
+                        pseudo: pseudo
+                    }
+                    localStorage.setItem("user", JSON.stringify(user));
+                    setUser(user!);
+                    navigate("/");
                 }
-                localStorage.setItem("user", JSON.stringify(user));
-                setUser(user!);
-                navigate("/");
-            }
-        }).catch((error) => {console.log(error)})
+            })
+            .catch((error) => {console.log(error)})
     };
 
     const isLoggedIn = () => {

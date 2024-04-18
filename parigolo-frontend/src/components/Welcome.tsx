@@ -41,41 +41,44 @@ const Welcome = () => {
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            axios.get(`/person/?pseudo=${JSON.parse(user).pseudo}`)
-                .then((response) => {
-                    console.log(response)
-                    setPerson(response.data)
+            axios.get(`/person/${JSON.parse(user).pseudo}`)
+            .then((response) => {
+                console.log(response)
+                setPerson(response.data)
+                
+                axios.get(`/rooms/${response.data?.id}`)
+                    .then((response) => {
+                        setRooms(response.data)
+                        console.log(response)
+                    })
+                    .catch((error) => console.log(error))
 
-                    axios.get(`/rooms/${response.data?.id}`)
-                        .then((response) => {
-                            setRooms(response.data)
-                            console.log(response)
-                        })
-                        .catch((error) => console.log(error))
+                axios.get(`/person-room`)
+                    .then((response) => {
+                        console.log(response.data)
+                        setParticipantRoom(response.data)
+                    })
+                    .catch((error) => console.log(error))
+            });
+            .catch((error) => console.log(error));
 
-                    axios.get(`/person-room`)
-                        .then((response) => {
-                            console.log(response.data)
-                            setParticipantRoom(response.data)
-                        })
-                        .catch((error) => console.log(error))
-                })
-                .catch((error) => console.log(error))
-
-            axios.get("/persons")
-                .then((response) => {
-                    setParticipants(response.data)
-                    console.log(response.data)
-                })
-                .catch((error) => console.log(error))
+        axios.get("/persons")
+            .then((response) => {
+                setParticipants(response.data)
+                console.log(response.data)
+            });
+            .catch((error) => console.log(error));
         }
     }, [])
 
     const handleCreation = () => {
-        axios.post<{ id: number }>('/rooms', { name: createdName, ownerId: person?.id })
+        axios.post("/rooms", { name: createdName, ownerId: person?.id })
             .then((response) => {
                 console.log(response)
-                axios.post('/person-room', { PersonId: person?.id, RoomId: response.data.id })
+                axios.post("/person-room", {PersonId: person?.id, RoomId: response.data.id})
+                    .then((response) => console.log(response))
+                    .catch((error) => console.log(error))
+                axios.post("/leaderboards", {PersonId: person?.id, RoomId: response.data.id, score: 0})
                     .then((response) => console.log(response))
                     .catch((error) => console.log(error))
                 setCreatedName("")
@@ -92,7 +95,7 @@ const Welcome = () => {
     };
 
     const handleAddition = () => {
-        axios.post('/person-room', { PersonId: addedParticipant, RoomId: addedRoom })
+        axios.post("/person-room", {PersonId: addedParticipant, RoomId: addedRoom})
             .then((response) => {
                 console.log(response);
                 setParticipantRoom((prevParticipantRoom: ParticipantRoom[]) => [...prevParticipantRoom, { PersonId: addedParticipant, RoomId: addedRoom } as ParticipantRoom]);
@@ -105,7 +108,10 @@ const Welcome = () => {
                 }));
                 setAddedRoom(0);
                 setAddedParticipant(0);
-            })
+            });
+            .catch((error) => console.log(error));
+        axios.post("/leaderboards", {PersonId: addedParticipant, RoomId: addedRoom, score: 0})
+            .then((response) => console.log(response));
             .catch((error) => console.log(error));
     }
 
@@ -114,7 +120,7 @@ const Welcome = () => {
             .then((response) => {
                 console.log(response);
                 setRooms(rooms?.filter(room => room.id !== id));
-            })
+            });
             .catch((error) => console.log(error));
     }
 
@@ -195,6 +201,9 @@ const Welcome = () => {
                         onClick={handleAddition}>
                         Confirm
                     </button>
+                </div>
+                <div>
+                    <button onClick={() => navigate("/logout")}>Se déconnecter</button>
                 </div>
             </div>
         </div>
