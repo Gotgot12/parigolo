@@ -11,7 +11,7 @@ const Bet = sequelize.define('Bet', {
   sport: DataTypes.STRING,
   isClosed: DataTypes.BOOLEAN,
   isEnded: DataTypes.BOOLEAN,
-  roomId: DataTypes.INTEGER,
+  RoomId: DataTypes.INTEGER,
 });
 
 export default Bet;

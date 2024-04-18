@@ -50,7 +50,7 @@ const Room = () => {
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            axios.get(`/person/?pseudo=${JSON.parse(user).pseudo}`)
+            axios.get(`/person/${JSON.parse(user).pseudo}`)
             .then((response) => {
                 console.log(response)
                 setPerson(response.data)
@@ -75,7 +75,7 @@ const Room = () => {
             sport: createdSport,
             isClosed: false,
             isEnded: false,
-            roomId: location.state.id
+            RoomId: location.state.id
         })
             .then((response) => {
                 setBets((previousBets) => [...previousBets, response.data])
@@ -101,7 +101,7 @@ const Room = () => {
         axios.post(`/choices`, {
             name: predictedResults,
             isWin: false,
-            betId: parseInt(predictedBet)
+            BetId: parseInt(predictedBet)
         })
             .then((response) => {
                 console.log(response.data)
