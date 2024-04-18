@@ -137,7 +137,10 @@ const Room = () => {
                                 .catch((error) => console.log(error))
                             
                             axios.put(`/leaderboards/${currentPersonLeaderboard?.id}`, currentPersonLeaderboard)
-                                .then((response) => console.log(response))
+                                .then((response) => {
+                                    window.location.reload();
+                                    console.log(response)
+                                })
                                 .catch((error) => console.log(error)) 
                         })
                         .catch((error) => console.log(error))
