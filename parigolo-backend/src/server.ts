@@ -211,7 +211,7 @@ app.get("/leaderboards/:roomId", async (req, res) => {
       if (person != null) {
         personPseudo = person.pseudo
       }
-      temp_leaderboards.push({personPseudo: personPseudo, score: leaderboard.score})
+      temp_leaderboards.push({id: leaderboard.id, personPseudo: personPseudo, score: leaderboard.score})
     }
     res.json(temp_leaderboards);
   } catch (err) {
@@ -228,8 +228,19 @@ app.post("/leaderboards", async (req, res) => {
   }
 });
 
+app.put("/leaderboards/:id/", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedLeaderboard = await Leaderboard.update(req.body, {where : {id: id }});
+    res.json(updatedLeaderboard);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 type TempLeaderboard = {
-  personPseudo: string
+  id: number,
+  personPseudo: string,
   score: number
 }
 

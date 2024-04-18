@@ -9,3 +9,5 @@ Front :
 - Page ajouter un pari à la main
 - Page résultat du pari
 - Page leaderboard
+
+personnes.sort((a, b) => b.score - a.score);
