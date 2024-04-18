@@ -35,7 +35,7 @@ Leaderboard.belongsTo(Room)
 Person.hasMany(Leaderboard)
 Leaderboard.belongsTo(Person)
 
-sequelize.sync();
+sequelize.sync({ alter: true });
 
 // Person endpoints
 app.get("/persons", async (_req, res) => {
@@ -159,6 +159,22 @@ app.post("/rooms", async (req, res) => {
   try {
     const newRoom = await Room.create(req.body);
     res.json(newRoom);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+app.delete('/rooms/:id', async (req, res) => {
+  try {
+    const room = await Room.findOne({ where: { id: req.params.id } });
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+    if (room.ownerId !== req.body.ownerId) {
+      return res.status(403).json({ error: 'Only the owner can delete the room' });
+    }
+    await Room.destroy({ where: { id: req.params.id } });
+    res.json({ message: 'Room deleted' });
   } catch (err) {
     res.status(500).json({ error: err });
   }
