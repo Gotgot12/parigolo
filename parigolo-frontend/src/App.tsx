@@ -34,13 +34,18 @@ const App = () => {
     useEffect(() => {
         if (user) {
             setPerson(JSON.parse(user))
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (person) {
             axios.get(`/rooms/${person?.id}`)
                 .then((response) => {
                     setRooms(response.data);
                 })
                 .catch((error) => console.log(error));
         }
-    }, [user]);
+    }, [person]);
 
     const handleRoomClick = (roomId: number) => {
         setDropdownOpen(false);
@@ -54,7 +59,7 @@ const App = () => {
                     <div className="relative">
                         <button
                             onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="bg-blue-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                         >
                             Rooms
                         </button>
