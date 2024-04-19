@@ -22,14 +22,14 @@ services:
       - backend_node_modules:/app/node_modules
       - ./parigolo-backend:/app
     ports:
-      - '${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}'
+      - '${BACKEND_HOST_PORT}:8000'
     expose:
-      - ${BACKEND_CONTAINER_PORT}
+      - 8000
     depends_on:
       - db
     environment:
       - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:${MYSQL_HOST_PORT}/${MYSQL_DATABASE}
-      - PORT=${BACKEND_CONTAINER_PORT}
+      - PORT=8000
   db:
     image: mysql:5.7
     environment:
