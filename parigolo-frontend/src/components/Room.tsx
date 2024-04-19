@@ -114,14 +114,14 @@ const Room = () => {
                         setIsAuthorized(true);
                     }
                 })
-        }
 
-        axios.get(`/choices/${person?.id}`)
-            .then((response) => {
-                setChoices(response.data)
-                console.log(response)
-            })
-            .catch((error) => console.log(error))
+            axios.get(`/choices/${person?.id}`)
+                .then((response) => {
+                    setChoices(response.data)
+                    console.log(response)
+                })
+                .catch((error) => console.log(error))
+        }
     }, [person]);
 
     const handleCreation = () => {
