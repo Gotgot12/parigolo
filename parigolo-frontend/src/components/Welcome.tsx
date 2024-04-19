@@ -14,7 +14,6 @@ type Room = {
 type Participant = {
     id: number;
     pseudo: string;
-    rooms?: Room
 }
 
 type ParticipantRoom = {
@@ -40,44 +39,44 @@ const Welcome = () => {
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            axios.get(`/person/${JSON.parse(user).pseudo}`)
-            .then((response) => {
-                console.log(response);
-                setPerson(response.data);
-                
-                axios.get(`/rooms/${response.data?.id}`)
-                    .then((response) => {
-                        setRooms(response.data);
-                        console.log(response);
-                    })
-                    .catch((error) => console.log(error));
-
-                axios.get(`/person-room`)
-                    .then((response) => {
-                        console.log(response.data)
-                        setParticipantRoom(response.data)
-                    })
-                    .catch((error) => console.log(error));
-            })
-            .catch((error) => console.log(error));
-
-        axios.get("/persons")
-            .then((response) => {
-                setParticipants(response.data);
-                console.log(response.data);
-            })
-            .catch((error) => console.log(error));
+            setPerson(JSON.parse(user));
         }
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (person) {
+            console.log(person?.id)
+            axios.get(`/rooms/${person?.id}`)
+                .then((response) => {
+                    setRooms(response.data);
+                    console.log(response.data);
+                })
+                .catch((error) => console.log(error));
+
+            axios.get(`/person-room`)
+                .then((response) => {
+                    console.log(response.data)
+                    setParticipantRoom(response.data)
+                })
+                .catch((error) => console.log(error));
+
+            axios.get("/persons")
+                .then((response) => {
+                    setParticipants(response.data);
+                    console.log(response.data);
+                })
+                .catch((error) => console.log(error));
+        }
+    }, [person])
 
     const handleCreation = () => {
         axios.post("/rooms", { name: createdName, ownerId: person?.id })
             .then((response) => {
                 console.log(response);
-                axios.post("/person-room", {PersonId: person?.id, RoomId: response.data.id})
+                axios.post("/person-room", { PersonId: person?.id, RoomId: response.data.id })
                     .then((response) => console.log(response))
                     .catch((error) => console.log(error))
-                axios.post("/leaderboards", {PersonId: person?.id, RoomId: response.data.id, score: 0})
+                axios.post("/leaderboards", { PersonId: person?.id, RoomId: response.data.id, score: 0 })
                     .then((response) => console.log(response))
                     .catch((error) => console.log(error))
                 setCreatedName("");
@@ -93,7 +92,7 @@ const Welcome = () => {
     };
 
     const handleAddition = () => {
-        axios.post("/person-room", {PersonId: addedParticipant, RoomId: addedRoom})
+        axios.post("/person-room", { PersonId: addedParticipant, RoomId: addedRoom })
             .then((response) => {
                 console.log(response);
                 setParticipantRoom((prevParticipantRoom: ParticipantRoom[]) => [...prevParticipantRoom, { PersonId: addedParticipant, RoomId: addedRoom } as ParticipantRoom]);
@@ -108,7 +107,7 @@ const Welcome = () => {
                 setAddedParticipant(0);
             })
             .catch((error) => console.log(error));
-        axios.post("/leaderboards", {PersonId: addedParticipant, RoomId: addedRoom, score: 0})
+        axios.post("/leaderboards", { PersonId: addedParticipant, RoomId: addedRoom, score: 0 })
             .then((response) => console.log(response))
             .catch((error) => console.log(error));
     }
@@ -123,7 +122,7 @@ const Welcome = () => {
     }
 
     const handleClick = (id: number) => {
-        navigate(`/rooms/${id}`, {state: {id: id} });
+        navigate(`/rooms/${id}`, { state: { id: id } });
     };
 
     return (
@@ -134,7 +133,7 @@ const Welcome = () => {
             <div className="grid grid-cols-3 gap-4 mb-10">
                 {rooms?.map((room) => (
                     <div key={room.id} className="bg-gray-100 p-4 rounded-md cursor-pointer"
-                         onClick={() => handleClick(room.id)}>
+                        onClick={() => handleClick(room.id)}>
                         <h2 className="text-2xl font-bold mb-4 text-center">{room.name}</h2>
                         <h3 className="text-xl font-bold mb-2">Owner : {participants.find(participant => participant.id === room.ownerId)?.pseudo}</h3>
                         <div>

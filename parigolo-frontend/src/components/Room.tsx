@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import axios from "../axios/axios";
 
 type Bet = {
@@ -38,7 +38,6 @@ type Leaderboard = {
 type Participant = {
     id: number;
     pseudo: string;
-    rooms?: Room
 }
 
 const Room = () => {
@@ -65,18 +64,17 @@ const Room = () => {
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            axios.get(`/person/${JSON.parse(user).pseudo}`)
-            .then((response: any) => {
-                console.log(response)
-                setPerson(response.data)
-                axios.get(`/choices/${response.data.id}`)
-                    .then((response) => {
-                        setChoices(response.data)
-                        console.log(response)
-                    })
-                    .catch((error) => console.log(error))
-            })
+            setPerson(JSON.parse(user));
         }
+    }, []);
+
+    useEffect(() => {
+        axios.get(`/choices/${person?.id}`)
+            .then((response) => {
+                setChoices(response.data)
+                console.log(response)
+            })
+            .catch((error) => console.log(error))
 
         axios.get(`/bets/${location.state.id}`)
             .then((response) => {
@@ -84,14 +82,14 @@ const Room = () => {
                 console.log(response.data)
             })
             .catch((error) => console.log(error))
-        
+
         axios.get(`/leaderboards/${location.state.id}`)
             .then((response) => {
                 console.log(response.data)
                 setLeaderboard(response.data)
             })
             .catch((error) => console.log(error))
-    }, [])
+    }, [person]);
 
     const handleCreation = () => {
         axios.post(`/bets`, {
@@ -120,30 +118,30 @@ const Room = () => {
                     const choices: Choice[] = response.data
                     choices.map((choice) => {
                         axios.get(`/choice-person/choice/${choice.id}`)
-                        .then((response) => {
-                            console.log(response.data)
-                            console.log(leaderboard)
-                            const currentPersonLeaderboard = leaderboard.find((leader) => leader.PersonId === response.data.PersonId)
-                            console.log(currentPersonLeaderboard)
-                            if (choice.name === addedResults) {
-                                choice.isWin = 1
-                                currentPersonLeaderboard!.score += 10;
-                            } else {
-                                choice.isWin = 0
-                                currentPersonLeaderboard!.score -= 10;
-                            }
-                            axios.put(`/choices/${choice.id}`, choice)
-                                .then((response) => console.log(response.data))
-                                .catch((error) => console.log(error))
-                            
-                            axios.put(`/leaderboards/${currentPersonLeaderboard?.id}`, currentPersonLeaderboard)
-                                .then((response) => {
-                                    window.location.reload();
-                                    console.log(response)
-                                })
-                                .catch((error) => console.log(error)) 
-                        })
-                        .catch((error) => console.log(error))
+                            .then((response) => {
+                                console.log(response.data)
+                                console.log(leaderboard)
+                                const currentPersonLeaderboard = leaderboard.find((leader) => leader.PersonId === response.data.PersonId)
+                                console.log(currentPersonLeaderboard)
+                                if (choice.name === addedResults) {
+                                    choice.isWin = 1
+                                    currentPersonLeaderboard!.score += 10;
+                                } else {
+                                    choice.isWin = 0
+                                    currentPersonLeaderboard!.score -= 10;
+                                }
+                                axios.put(`/choices/${choice.id}`, choice)
+                                    .then((response) => console.log(response.data))
+                                    .catch((error) => console.log(error))
+
+                                axios.put(`/leaderboards/${currentPersonLeaderboard?.id}`, currentPersonLeaderboard)
+                                    .then((response) => {
+                                        window.location.reload();
+                                        console.log(response)
+                                    })
+                                    .catch((error) => console.log(error))
+                            })
+                            .catch((error) => console.log(error))
                     })
                 })
                 .catch((error) => console.log(error))
@@ -259,7 +257,7 @@ const Room = () => {
                         <option value="Tennis">Tennis</option>
                     </select>
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                            onClick={handleCreation}>
+                        onClick={handleCreation}>
                         Confirm
                     </button>
                 </div>
@@ -283,7 +281,7 @@ const Room = () => {
                         className="w-full p-2 border border-gray-200 rounded-md mr-4"
                     />
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                            onClick={handleAddition}>
+                        onClick={handleAddition}>
                         Confirm
                     </button>
                 </div>
@@ -308,7 +306,7 @@ const Room = () => {
                         className="w-full p-2 border border-gray-200 rounded-md mr-4"
                     />
                     <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                            onClick={handlePrediction}>
+                        onClick={handlePrediction}>
                         Confirm
                     </button>
                 </div>

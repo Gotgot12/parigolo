@@ -2,10 +2,11 @@ import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-import {API_BASE_URL} from "../apiConfig";
+import { API_BASE_URL } from "../apiConfig";
 import axios from "axios";
 
 type User = {
+    id: number,
     pseudo: string,
 }
 
@@ -34,6 +35,21 @@ export const UserProvider = ({ children }: Props) => {
         setIsReady(true);
     }, []);
 
+    const handleUserResponse = (response: any, pseudo: string) => {
+        if (response.status !== 500 && response.status === 200) {
+            console.log(response.data)
+
+            const user = {
+                id: response.data.id,
+                pseudo: pseudo
+            }
+
+            localStorage.setItem("user", JSON.stringify(user));
+            setUser(user!);
+            navigate("/");
+        }
+    };
+
     const signinUser = (pseudo: string, password: string) => {
         const data = {
             pseudo: pseudo,
@@ -41,17 +57,9 @@ export const UserProvider = ({ children }: Props) => {
         }
         axios.post(API_BASE_URL + "/signup", data)
             .then((response) => {
-                console.log(response)
-                if (response.status !== 500 && response.status === 200) {
-                    const user = {
-                        pseudo: pseudo
-                    }
-                    localStorage.setItem("user", JSON.stringify(user));
-                    setUser(user!);
-                    navigate("/");
-                }
+                handleUserResponse(response, pseudo);
             })
-            .catch((error) => {console.log(error)})
+            .catch((error) => { console.log(error) })
     };
 
     const loginUser = (pseudo: string, password: string) => {
@@ -61,16 +69,9 @@ export const UserProvider = ({ children }: Props) => {
         };
         axios.post(API_BASE_URL + "/login", data)
             .then((response) => {
-                if (response.status !== 500 && response.status === 200) {
-                    const user = {
-                        pseudo: pseudo
-                    }
-                    localStorage.setItem("user", JSON.stringify(user));
-                    setUser(user!);
-                    navigate("/");
-                }
+                handleUserResponse(response, pseudo);
             })
-            .catch((error) => {console.log(error)})
+            .catch((error) => { console.log(error) })
     };
 
     const isLoggedIn = () => {

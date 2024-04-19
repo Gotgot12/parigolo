@@ -15,14 +15,15 @@ type Room = {
 type Participant = {
     id: number;
     pseudo: string;
-    rooms?: Room
 }
 
 const App = () => {
 
     const user = localStorage.getItem("user");
-    
+
     const [rooms, setRooms] = useState<Room[]>([]);
+    const [person, setPerson] = useState<Participant>();
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const navigate = useNavigate();
@@ -32,13 +33,10 @@ const App = () => {
 
     useEffect(() => {
         if (user) {
-            axios.get(`/person/${JSON.parse(user).pseudo}`)
+            setPerson(JSON.parse(user))
+            axios.get(`/rooms/${person?.id}`)
                 .then((response) => {
-                    axios.get(`/rooms/${response.data?.id}`)
-                        .then((response) => {
-                            setRooms(response.data);
-                        })
-                        .catch((error) => console.log(error));
+                    setRooms(response.data);
                 })
                 .catch((error) => console.log(error));
         }
@@ -64,8 +62,8 @@ const App = () => {
                             <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                     {rooms.map((room) => (
-                                        <a 
-                                            key={room.id} 
+                                        <a
+                                            key={room.id}
                                             onClick={() => handleRoomClick(room.id)}
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                             role="menuitem"
