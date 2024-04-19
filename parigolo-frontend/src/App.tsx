@@ -54,9 +54,9 @@ const App = () => {
                     <div className="relative">
                         <button
                             onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                         >
-                            My Bet Rooms
+                            Rooms
                         </button>
                         {dropdownOpen && (
                             <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">

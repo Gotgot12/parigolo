@@ -255,7 +255,7 @@ const Room = () => {
                                         key={row.id}
                                     >
                                         <TableCell align="center" component="th" scope="row" style={{ width: '33.33%' }}>
-                                            {position}
+                                            {position + 1}
                                         </TableCell>
                                         <TableCell align="center" style={{ width: '33.33%' }}>{row.personPseudo}</TableCell>
                                         <TableCell align="center" style={{ width: '33.33%' }}>{row.score}</TableCell>
@@ -291,55 +291,58 @@ const Room = () => {
                 ))}
             </div>
             <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Create a new bet</h2>
-                    <input
-                        type="text"
-                        value={createdName}
-                        onChange={(e) => setCreatedName(e.target.value)}
-                        placeholder="Enter the name"
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    />
-                    <select
-                        value={createdSport}
-                        onChange={(e) => setCreatedSport(e.target.value)}
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    >
-                        <option value="0" disabled>Select the sport</option>
-                        <option value="Football">Football</option>
-                        <option value="Basketball">Basketball</option>
-                        <option value="Tennis">Tennis</option>
-                    </select>
-                    <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                        onClick={handleCreation}>
-                        Confirm
-                    </button>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Add results to a bet</h2>
-                    <select
-                        value={addedBet}
-                        onChange={(e) => setAddedBet(e.target.value)}
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    >
-                        <option key={0} value="0" disabled>Select the bet</option>
-                        {bets.map((bet) => (
-                            <option key={bet.id} value={bet.id}>{bet.name}</option>
-                        ))};
-                    </select>
-                    <input
-                        type="text"
-                        value={addedResults}
-                        onChange={(e) => setAddedResults(e.target.value)}
-                        placeholder="Enter the results"
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4"
-                    />
-                    <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                        onClick={handleAddition}>
-                        Confirm
-                    </button>
-                </div>
-
+                {room?.ownerId === person?.id && (
+                    <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
+                        <h2 className="text-2xl font-bold mb-4">Create a new bet</h2>
+                        <input
+                            type="text"
+                            value={createdName}
+                            onChange={(e) => setCreatedName(e.target.value)}
+                            placeholder="Enter the name"
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        />
+                        <select
+                            value={createdSport}
+                            onChange={(e) => setCreatedSport(e.target.value)}
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        >
+                            <option value="0" disabled>Select the sport</option>
+                            <option value="Football">Football</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Tennis">Tennis</option>
+                        </select>
+                        <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+                            onClick={handleCreation}>
+                            Confirm
+                        </button>
+                    </div>
+                )}
+                {room?.ownerId === person?.id && (
+                    <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
+                        <h2 className="text-2xl font-bold mb-4">Add results to a bet</h2>
+                        <select
+                            value={addedBet}
+                            onChange={(e) => setAddedBet(e.target.value)}
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        >
+                            <option key={0} value="0" disabled>Select the bet</option>
+                            {bets.map((bet) => (
+                                <option key={bet.id} value={bet.id}>{bet.name}</option>
+                            ))};
+                        </select>
+                        <input
+                            type="text"
+                            value={addedResults}
+                            onChange={(e) => setAddedResults(e.target.value)}
+                            placeholder="Enter the results"
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4"
+                        />
+                        <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+                            onClick={handleAddition}>
+                            Confirm
+                        </button>
+                    </div>
+                )}
                 <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
                     <h2 className="text-2xl font-bold mb-4">Give a prediction</h2>
                     <select
