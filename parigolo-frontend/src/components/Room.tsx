@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import axios from "../axios/axios";
 
@@ -16,6 +16,7 @@ type Bet = {
 type Room = {
     id: number;
     name: string;
+    ownerId: number;
     participants?: Participant[]
 }
 
@@ -61,32 +62,64 @@ const Room = () => {
 
     const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
 
+    let { id } = useParams();
+
+    const navigate = useNavigate();
+
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    const [room, setRoom] = useState<Room>();
+
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            setPerson(JSON.parse(user));
+            setPerson(JSON.parse(user))
         }
-    }, []);
-
-    useEffect(() => {
-        axios.get(`/choices/${person?.id}`)
+        axios.get(`/room/${id}`)
             .then((response) => {
-                setChoices(response.data)
-                console.log(response)
+                console.log(response);
+                setRoom(response.data);
             })
-            .catch((error) => console.log(error))
+            .catch((error) => console.log(error));
 
-        axios.get(`/bets/${location.state.id}`)
+        axios.get(`/bets/${id}`)
             .then((response) => {
                 setBets(response.data)
                 console.log(response.data)
             })
             .catch((error) => console.log(error))
 
-        axios.get(`/leaderboards/${location.state.id}`)
+        axios.get(`/leaderboards/${id}`)
             .then((response) => {
-                console.log(response.data)
-                setLeaderboard(response.data)
+                console.log(response);
+                setLeaderboard(response.data.sort(compareScore));
+            })
+            .catch((error) => console.log(error));
+    }, []);
+
+    useEffect(() => {
+        axios.get(`/person-room/${person?.id}`)
+            .then((response) => {
+                console.log(response.data);
+                let isInTheRoom = false;
+                for (const personRoom of response.data) {
+                    if (personRoom.RoomId == parseInt(id!)) {
+                        isInTheRoom = true;
+                    }
+                }
+                if (person) {
+                    if (!isInTheRoom) {
+                        navigate("/")
+                    } else {
+                        setIsAuthorized(true);
+                    }
+                }
+            })
+
+        axios.get(`/choices/${person?.id}`)
+            .then((response) => {
+                setChoices(response.data)
+                console.log(response)
             })
             .catch((error) => console.log(error))
     }, [person]);
@@ -97,7 +130,7 @@ const Room = () => {
             sport: createdSport,
             isClosed: false,
             isEnded: false,
-            RoomId: location.state.id
+            RoomId: id
         })
             .then((response) => {
                 setBets((previousBets) => [...previousBets, response.data])
@@ -155,8 +188,23 @@ const Room = () => {
         }
     };
 
+    const compareScore = (a: Leaderboard, b: Leaderboard) => {
+        if (a.score < b.score) {
+            return 1;
+        }
+        if (a.score > b.score) {
+            return -1;
+        }
+        return 0;
+    };
+
     const handleDeletion = (id: number) => {
-        setBets(bets.filter(bet => bet.id !== id));
+        axios.delete(`/bets/${id}`)
+            .then((response) => {
+                console.log(response);
+                setBets(bets?.filter(bet => bet.id !== id));
+            })
+            .catch((error) => console.log(error));
     }
 
     const handlePrediction = () => {
@@ -182,9 +230,13 @@ const Room = () => {
             .catch((error) => console.log(error))
     }
 
+    if (!isAuthorized) {
+        return <div></div>;
+    }
+
     return (
         <div className="container mx-auto">
-            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">{location.state.name}</h1>
+            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">{room?.name}</h1>
             <div className="grid grid-cols-1 gap-4 mb-10">
                 <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
                     <h2 className="text-2xl font-bold mb-4 text-center">Leaderboard</h2>
@@ -227,12 +279,14 @@ const Room = () => {
                                 )}
                             </ul>
                         </div>
-                        <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletion(bet.id);
-                        }}>
-                            Delete
-                        </button>
+                        {room?.ownerId === person?.id && (
+                            <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeletion(bet.id);
+                            }}>
+                                Delete
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>

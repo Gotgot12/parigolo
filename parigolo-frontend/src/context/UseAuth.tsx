@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import React from "react";
 
 import { API_BASE_URL } from "../apiConfig";
@@ -27,6 +27,9 @@ export const UserProvider = ({ children }: Props) => {
     const [user, setUser] = useState<User | null>(null);
     const [isReady, setIsReady] = useState(false);
 
+    const location = useLocation();
+    const { from } = location.state || { from: { pathname: '/' } };
+
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
@@ -46,7 +49,7 @@ export const UserProvider = ({ children }: Props) => {
 
             localStorage.setItem("user", JSON.stringify(user));
             setUser(user!);
-            navigate("/");
+            navigate(from);
         }
     };
 

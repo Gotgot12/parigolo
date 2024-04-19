@@ -213,6 +213,19 @@ app.post('/choice-person', async (req, res) => {
   }
 })
 
+app.delete('/bets/:id', async (req, res) => {
+  try {
+    const bet = await Bet.findOne({ where: { id: req.params.id } });
+    if (!bet) {
+      return res.status(404).json({ error: 'Bet not found' });
+    }
+    await Bet.destroy({ where: { id: req.params.id } });
+    res.json({ message: 'Bet deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 // Room endpoints
 app.get("/rooms/:personId", async (req, res) => {
   try {
@@ -272,6 +285,17 @@ app.delete('/rooms/:id', async (req, res) => {
 app.get("/person-room", async (_req, res) => {
   try {
     const personRoom = await PersonRoom.findAll()
+    res.json(personRoom);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+})
+
+app.get("/person-room/:personId", async (req, res) => {
+  try {
+    const { personId } = req.params;
+
+    const personRoom = await PersonRoom.findAll({ where: { PersonId: personId} })
     res.json(personRoom);
   } catch (err) {
     res.status(500).json({ error: err });

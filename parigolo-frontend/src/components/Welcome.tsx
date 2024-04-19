@@ -122,7 +122,7 @@ const Welcome = () => {
     }
 
     const handleClick = (id: number) => {
-        navigate(`/rooms/${id}`, { state: { id: id } });
+        navigate(`/rooms/${id}`);
     };
 
     return (
