@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import axios from "../axios/axios";
 
@@ -16,6 +16,7 @@ type Bet = {
 type Room = {
     id: number;
     name: string;
+    ownerId: number;
     participants?: Participant[]
 }
 
@@ -61,15 +62,59 @@ const Room = () => {
 
     const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
 
+    let { id } = useParams();
+
+    const navigate = useNavigate();
+
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    const [room, setRoom] = useState<Room>();
+
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
-            setPerson(JSON.parse(user));
+            setPerson(JSON.parse(user))
         }
+        axios.get(`/room/${id}`)
+            .then((response) => {
+                console.log(response);
+                setRoom(response.data);
+            })
+            .catch((error) => console.log(error));
+
+        axios.get(`/bets/${id}`)
+            .then((response) => {
+                setBets(response.data)
+                console.log(response.data)
+            })
+            .catch((error) => console.log(error))
+
+        axios.get(`/leaderboards/${id}`)
+            .then((response) => {
+                console.log(response);
+                setLeaderboard(response.data.sort(compareScore));
+            })
+            .catch((error) => console.log(error));
     }, []);
 
     useEffect(() => {
         if (person) {
+            axios.get(`/person-room/${person?.id}`)
+                .then((response) => {
+                    console.log(response.data);
+                    let isInTheRoom = false;
+                    for (const personRoom of response.data) {
+                        if (personRoom.RoomId == parseInt(id!)) {
+                            isInTheRoom = true;
+                        }
+                    }
+                    if (!isInTheRoom) {
+                        navigate("/")
+                    } else {
+                        setIsAuthorized(true);
+                    }
+                })
+
             axios.get(`/choices/${person?.id}`)
                 .then((response) => {
                     setChoices(response.data)
@@ -79,31 +124,13 @@ const Room = () => {
         }
     }, [person]);
 
-    useEffect(() => {
-        if (location) {
-            axios.get(`/bets/${location.state.id}`)
-                .then((response) => {
-                    setBets(response.data)
-                    console.log(response.data)
-                })
-                .catch((error) => console.log(error))
-
-            axios.get(`/leaderboards/${location.state.id}`)
-                .then((response) => {
-                    console.log(response.data)
-                    setLeaderboard(response.data)
-                })
-                .catch((error) => console.log(error))
-        }
-    }, [location]);
-
     const handleCreation = () => {
         axios.post(`/bets`, {
             name: createdName,
             sport: createdSport,
             isClosed: false,
             isEnded: false,
-            RoomId: location.state.id
+            RoomId: id
         })
             .then((response) => {
                 setBets((previousBets) => [...previousBets, response.data])
@@ -161,8 +188,23 @@ const Room = () => {
         }
     };
 
+    const compareScore = (a: Leaderboard, b: Leaderboard) => {
+        if (a.score < b.score) {
+            return 1;
+        }
+        if (a.score > b.score) {
+            return -1;
+        }
+        return 0;
+    };
+
     const handleDeletion = (id: number) => {
-        setBets(bets.filter(bet => bet.id !== id));
+        axios.delete(`/bets/${id}`)
+            .then((response) => {
+                console.log(response);
+                setBets(bets?.filter(bet => bet.id !== id));
+            })
+            .catch((error) => console.log(error));
     }
 
     const handlePrediction = () => {
@@ -188,9 +230,13 @@ const Room = () => {
             .catch((error) => console.log(error))
     }
 
+    if (!isAuthorized) {
+        return <div></div>;
+    }
+
     return (
         <div className="container mx-auto">
-            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">{location.state.name}</h1>
+            <h1 className="text-5xl font-bold mb-10 mt-10 text-center">{room?.name}</h1>
             <div className="grid grid-cols-1 gap-4 mb-10">
                 <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
                     <h2 className="text-2xl font-bold mb-4 text-center">Leaderboard</h2>
@@ -209,7 +255,7 @@ const Room = () => {
                                         key={row.id}
                                     >
                                         <TableCell align="center" component="th" scope="row" style={{ width: '33.33%' }}>
-                                            {position}
+                                            {position + 1}
                                         </TableCell>
                                         <TableCell align="center" style={{ width: '33.33%' }}>{row.personPseudo}</TableCell>
                                         <TableCell align="center" style={{ width: '33.33%' }}>{row.score}</TableCell>
@@ -233,65 +279,70 @@ const Room = () => {
                                 )}
                             </ul>
                         </div>
-                        <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletion(bet.id);
-                        }}>
-                            Delete
-                        </button>
+                        {room?.ownerId === person?.id && (
+                            <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeletion(bet.id);
+                            }}>
+                                Delete
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>
             <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Create a new bet</h2>
-                    <input
-                        type="text"
-                        value={createdName}
-                        onChange={(e) => setCreatedName(e.target.value)}
-                        placeholder="Enter the name"
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    />
-                    <select
-                        value={createdSport}
-                        onChange={(e) => setCreatedSport(e.target.value)}
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    >
-                        <option value="0" disabled>Select the sport</option>
-                        <option value="Football">Football</option>
-                        <option value="Basketball">Basketball</option>
-                        <option value="Tennis">Tennis</option>
-                    </select>
-                    <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                        onClick={handleCreation}>
-                        Confirm
-                    </button>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Add results to a bet</h2>
-                    <select
-                        value={addedBet}
-                        onChange={(e) => setAddedBet(e.target.value)}
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    >
-                        <option key={0} value="0" disabled>Select the bet</option>
-                        {bets.map((bet) => (
-                            <option key={bet.id} value={bet.id}>{bet.name}</option>
-                        ))};
-                    </select>
-                    <input
-                        type="text"
-                        value={addedResults}
-                        onChange={(e) => setAddedResults(e.target.value)}
-                        placeholder="Enter the results"
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4"
-                    />
-                    <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                        onClick={handleAddition}>
-                        Confirm
-                    </button>
-                </div>
-
+                {room?.ownerId === person?.id && (
+                    <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
+                        <h2 className="text-2xl font-bold mb-4">Create a new bet</h2>
+                        <input
+                            type="text"
+                            value={createdName}
+                            onChange={(e) => setCreatedName(e.target.value)}
+                            placeholder="Enter the name"
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        />
+                        <select
+                            value={createdSport}
+                            onChange={(e) => setCreatedSport(e.target.value)}
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        >
+                            <option value="0" disabled>Select the sport</option>
+                            <option value="Football">Football</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Tennis">Tennis</option>
+                        </select>
+                        <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+                            onClick={handleCreation}>
+                            Confirm
+                        </button>
+                    </div>
+                )}
+                {room?.ownerId === person?.id && (
+                    <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
+                        <h2 className="text-2xl font-bold mb-4">Add results to a bet</h2>
+                        <select
+                            value={addedBet}
+                            onChange={(e) => setAddedBet(e.target.value)}
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        >
+                            <option key={0} value="0" disabled>Select the bet</option>
+                            {bets.map((bet) => (
+                                <option key={bet.id} value={bet.id}>{bet.name}</option>
+                            ))};
+                        </select>
+                        <input
+                            type="text"
+                            value={addedResults}
+                            onChange={(e) => setAddedResults(e.target.value)}
+                            placeholder="Enter the results"
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4"
+                        />
+                        <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
+                            onClick={handleAddition}>
+                            Confirm
+                        </button>
+                    </div>
+                )}
                 <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
                     <h2 className="text-2xl font-bold mb-4">Give a prediction</h2>
                     <select
