@@ -69,27 +69,33 @@ const Room = () => {
     }, []);
 
     useEffect(() => {
-        axios.get(`/choices/${person?.id}`)
-            .then((response) => {
-                setChoices(response.data)
-                console.log(response)
-            })
-            .catch((error) => console.log(error))
-
-        axios.get(`/bets/${location.state.id}`)
-            .then((response) => {
-                setBets(response.data)
-                console.log(response.data)
-            })
-            .catch((error) => console.log(error))
-
-        axios.get(`/leaderboards/${location.state.id}`)
-            .then((response) => {
-                console.log(response.data)
-                setLeaderboard(response.data)
-            })
-            .catch((error) => console.log(error))
+        if (person) {
+            axios.get(`/choices/${person?.id}`)
+                .then((response) => {
+                    setChoices(response.data)
+                    console.log(response)
+                })
+                .catch((error) => console.log(error))
+        }
     }, [person]);
+
+    useEffect(() => {
+        if (location) {
+            axios.get(`/bets/${location.state.id}`)
+                .then((response) => {
+                    setBets(response.data)
+                    console.log(response.data)
+                })
+                .catch((error) => console.log(error))
+
+            axios.get(`/leaderboards/${location.state.id}`)
+                .then((response) => {
+                    console.log(response.data)
+                    setLeaderboard(response.data)
+                })
+                .catch((error) => console.log(error))
+        }
+    }, [location]);
 
     const handleCreation = () => {
         axios.post(`/bets`, {

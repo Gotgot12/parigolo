@@ -41,6 +41,20 @@ const Welcome = () => {
         if (user) {
             setPerson(JSON.parse(user));
         }
+
+        axios.get(`/person-room`)
+            .then((response) => {
+                console.log(response.data)
+                setParticipantRoom(response.data)
+            })
+            .catch((error) => console.log(error));
+
+        axios.get("/persons")
+            .then((response) => {
+                setParticipants(response.data);
+                console.log(response.data);
+            })
+            .catch((error) => console.log(error));
     }, []);
 
     useEffect(() => {
@@ -49,20 +63,6 @@ const Welcome = () => {
             axios.get(`/rooms/${person?.id}`)
                 .then((response) => {
                     setRooms(response.data);
-                    console.log(response.data);
-                })
-                .catch((error) => console.log(error));
-
-            axios.get(`/person-room`)
-                .then((response) => {
-                    console.log(response.data)
-                    setParticipantRoom(response.data)
-                })
-                .catch((error) => console.log(error));
-
-            axios.get("/persons")
-                .then((response) => {
-                    setParticipants(response.data);
                     console.log(response.data);
                 })
                 .catch((error) => console.log(error));
