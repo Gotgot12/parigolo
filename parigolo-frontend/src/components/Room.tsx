@@ -98,23 +98,23 @@ const Room = () => {
     }, []);
 
     useEffect(() => {
-        axios.get(`/person-room/${person?.id}`)
-            .then((response) => {
-                console.log(response.data);
-                let isInTheRoom = false;
-                for (const personRoom of response.data) {
-                    if (personRoom.RoomId == parseInt(id!)) {
-                        isInTheRoom = true;
+        if (person) {
+            axios.get(`/person-room/${person?.id}`)
+                .then((response) => {
+                    console.log(response.data);
+                    let isInTheRoom = false;
+                    for (const personRoom of response.data) {
+                        if (personRoom.RoomId == parseInt(id!)) {
+                            isInTheRoom = true;
+                        }
                     }
-                }
-                if (person) {
                     if (!isInTheRoom) {
                         navigate("/")
                     } else {
                         setIsAuthorized(true);
                     }
-                }
-            })
+                })
+        }
 
         axios.get(`/choices/${person?.id}`)
             .then((response) => {
