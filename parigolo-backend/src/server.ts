@@ -50,7 +50,7 @@ app.get("/persons", async (_req, res) => {
 app.get("/person/:pseudo", async (req, res) => {
   try {
     const { pseudo } = req.params;
-    const person = await Person.findOne({where: {pseudo: pseudo}})
+    const person = await Person.findOne({ where: { pseudo: pseudo } })
     res.json(person);
   } catch (err) {
     res.status(500).json({ error: req.body });
@@ -59,13 +59,13 @@ app.get("/person/:pseudo", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   try {
-    const personSearch = await Person.findOne({ where: { pseudo : req.body.pseudo }})
+    const personSearch = await Person.findOne({ where: { pseudo: req.body.pseudo } })
     if (personSearch === null) {
       const newPerson = await Person.create(req.body);
       console.log(newPerson)
       res.json(newPerson);
     } else {
-      res.status(500).json({error: "pseudo already existed"})
+      res.status(500).json({ error: "pseudo already existed" })
     }
   } catch (err) {
     res.status(500).json({ error: err });
@@ -73,15 +73,15 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const personSearch = await Person.findOne({ where: { pseudo : req.body.pseudo }})
+  const personSearch = await Person.findOne({ where: { pseudo: req.body.pseudo } })
   if (personSearch !== null) {
     if (personSearch.getDataValue("password") === req.body.password) {
-      res.send("login ok")
+      res.json(personSearch);
     } else {
-      res.status(500).json({error: "no match"})
+      res.status(500).json({ error: "no match" })
     }
   } else {
-      res.status(500).json({error: "no found"})
+    res.status(500).json({ error: "no found" })
   }
 })
 
@@ -99,7 +99,7 @@ app.get("/bets", async (_req, res) => {
 app.get('/bets/:roomId', async (req, res) => {
   try {
     const { roomId } = req.params;
-    const bets = await Bet.findAll({where: {RoomId: roomId}})
+    const bets = await Bet.findAll({ where: { RoomId: roomId } })
     res.json(bets);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -118,7 +118,7 @@ app.post('/bets', async (req, res) => {
 app.put(`/bets/:id`, async (req, res) => {
   try {
     const id = req.params.id;
-    const updatedBet = await Bet.update(req.body, {where : {id: id }});
+    const updatedBet = await Bet.update(req.body, { where: { id: id } });
     res.json(updatedBet);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -139,14 +139,14 @@ app.get("/choices", async (_req, res) => {
 app.get("/choices/:personId", async (req, res) => {
   try {
     const { personId } = req.params;
-    const choicePerson = await ChoicePerson.findAll({where: {PersonId: personId}})
+    const choicePerson = await ChoicePerson.findAll({ where: { PersonId: personId } })
 
     const choicesByPerson: number[] = []
     choicePerson.forEach((choicePers) => {
       choicesByPerson.push(choicePers.ChoiceId)
     })
 
-    const choices = await Choice.findAll({where: {id: choicesByPerson}})
+    const choices = await Choice.findAll({ where: { id: choicesByPerson } })
     res.json(choices);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -156,7 +156,7 @@ app.get("/choices/:personId", async (req, res) => {
 app.get(`/choices/bet/:betId`, async (req, res) => {
   try {
     const { betId } = req.params;
-    const choicesBet = await Choice.findAll({where: {BetId: betId}})
+    const choicesBet = await Choice.findAll({ where: { BetId: betId } })
     res.json(choicesBet);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -175,7 +175,7 @@ app.post("/choices", async (req, res) => {
 app.put(`/choices/:id`, async (req, res) => {
   try {
     const id = req.params.id;
-    const updatedChoice = await Choice.update(req.body, {where : {id: id }});
+    const updatedChoice = await Choice.update(req.body, { where: { id: id } });
     res.json(updatedChoice);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -186,7 +186,7 @@ app.get('/choice-person/:personId', async (req, res) => {
   try {
     const { personId } = req.params;
 
-    const choicePerson = await ChoicePerson.findAll({where: {PersonId: personId}});
+    const choicePerson = await ChoicePerson.findAll({ where: { PersonId: personId } });
     res.json(choicePerson);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -197,7 +197,7 @@ app.get('/choice-person/choice/:choiceId', async (req, res) => {
   try {
     const { choiceId } = req.params;
 
-    const choicePerson = await ChoicePerson.findOne({where: {ChoiceId: choiceId}});
+    const choicePerson = await ChoicePerson.findOne({ where: { ChoiceId: choiceId } });
     res.json(choicePerson);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -217,14 +217,14 @@ app.post('/choice-person', async (req, res) => {
 app.get("/rooms/:personId", async (req, res) => {
   try {
     const { personId } = req.params;
-    const personRoom = await PersonRoom.findAll({where: {PersonId: personId}})
+    const personRoom = await PersonRoom.findAll({ where: { PersonId: personId } })
 
     const roomsByPerson: number[] = []
     personRoom.forEach((persRoom) => {
       roomsByPerson.push(persRoom.RoomId)
     })
 
-    const rooms = await Room.findAll({where: {id: roomsByPerson}})
+    const rooms = await Room.findAll({ where: { id: roomsByPerson } })
     res.json(rooms);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -235,7 +235,7 @@ app.get("/room/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
 
-    const room = await Room.findOne({where: {id: roomId}})
+    const room = await Room.findOne({ where: { id: roomId } })
     res.json(room);
   } catch (err) {
     res.status(500).json({ error: err });
@@ -290,16 +290,16 @@ app.post("/person-room", async (req, res) => {
 app.get("/leaderboards/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const leaderboards = await Leaderboard.findAll({where: {RoomId: roomId}})
+    const leaderboards = await Leaderboard.findAll({ where: { RoomId: roomId } })
     console.log(leaderboards)
     const temp_leaderboards: TempLeaderboard[] = []
     for (const leaderboard of leaderboards) {
-      const person = await Person.findOne({where: {id: leaderboard.id}})
+      const person = await Person.findOne({ where: { id: leaderboard.id } })
       let personPseudo = "";
       if (person != null) {
         personPseudo = person.pseudo
       }
-      temp_leaderboards.push({id: leaderboard.id, personPseudo: personPseudo, score: leaderboard.score, RoomId: parseInt(roomId), PersonId: person!.id})
+      temp_leaderboards.push({ id: leaderboard.id, personPseudo: personPseudo, score: leaderboard.score, RoomId: parseInt(roomId), PersonId: person!.id })
     }
     res.json(temp_leaderboards);
   } catch (err) {
@@ -319,7 +319,7 @@ app.post("/leaderboards", async (req, res) => {
 app.put("/leaderboards/:id/", async (req, res) => {
   try {
     const id = req.params.id;
-    const updatedLeaderboard = await Leaderboard.update(req.body, {where : {id: id }});
+    const updatedLeaderboard = await Leaderboard.update(req.body, { where: { id: id } });
     res.json(updatedLeaderboard);
   } catch (err) {
     res.status(500).json({ error: err });
