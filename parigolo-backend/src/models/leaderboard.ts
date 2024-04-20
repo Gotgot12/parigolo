@@ -1,17 +1,20 @@
 import {DataTypes, Model} from "sequelize";
 import { sequelize } from "../database";
 import Room from "./room";
+import Person from "./person";
 
 interface LeaderboardAttributes {
     id: number;
     score: number;
-    RoomId: number
+    RoomId: number;
+    PersonId: number;
 }
 
 class Leaderboard extends Model<LeaderboardAttributes> implements LeaderboardAttributes {
     public id!: number;
     public score!: number;
     public RoomId!: number;
+    public PersonId!: number;
 }
 
 Leaderboard.init(
@@ -26,6 +29,13 @@ Leaderboard.init(
             type: DataTypes.INTEGER,
             references: {
                 model: Room,
+                key: 'id',
+            },
+        },
+        PersonId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: Person,
                 key: 'id',
             },
         }
