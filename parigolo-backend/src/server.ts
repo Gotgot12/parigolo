@@ -318,7 +318,7 @@ app.get("/leaderboards/:roomId", async (req, res) => {
     console.log(leaderboards)
     const temp_leaderboards: TempLeaderboard[] = []
     for (const leaderboard of leaderboards) {
-      const person = await Person.findOne({ where: { id: leaderboard.id } })
+      const person = await Person.findOne({ where: { id: leaderboard.PersonId } })
       let personPseudo = "";
       if (person != null) {
         personPseudo = person.pseudo

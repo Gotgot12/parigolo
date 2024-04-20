@@ -62,7 +62,7 @@ const Room = () => {
 
     const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
 
-    let { id } = useParams();
+    const { id } = useParams();
 
     const navigate = useNavigate();
 
@@ -275,7 +275,7 @@ const Room = () => {
                             <ul>
                                 <li key={bet.id}><span className="mr-2">&#8226;</span> Sport : {bet.sport}</li>
                                 {choices.find((choice) => choice.BetId === bet.id) && (
-                                    <li><span className="mr-2">&#8226;</span> Prédiction du joueur : {choices.find((choice) => choice.BetId === bet.id)?.name}</li>
+                                    <li><span className="mr-2">&#8226;</span> Prediction : {choices.find((choice) => choice.BetId === bet.id)?.name}</li>
                                 )}
                             </ul>
                         </div>
