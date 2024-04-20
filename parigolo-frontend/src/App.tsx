@@ -50,6 +50,7 @@ const App = () => {
     const handleRoomClick = (roomId: number) => {
         setDropdownOpen(false);
         navigate(`/rooms/${roomId}`);
+        window.location.reload();
     };
 
     return (
