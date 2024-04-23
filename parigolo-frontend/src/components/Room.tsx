@@ -41,6 +41,11 @@ type Participant = {
     pseudo: string;
 }
 
+type Sport = {
+    id: number;
+    name: string;
+}
+
 const Room = () => {
 
     const location = useLocation();
@@ -70,6 +75,8 @@ const Room = () => {
 
     const [room, setRoom] = useState<Room>();
 
+    const [sports, setSports] = useState<Sport[]>([]);
+
     useEffect(() => {
         const user = localStorage.getItem("user");
         if (user) {
@@ -95,6 +102,13 @@ const Room = () => {
                 setLeaderboard(response.data.sort(compareScore));
             })
             .catch((error) => console.log(error));
+
+            axios.get(`/sports`)
+                .then((response) => {
+                    console.log(response);
+                    setSports(response.data);
+                })
+                .catch((error) => console.log(error));
     }, []);
 
     useEffect(() => {
@@ -307,10 +321,20 @@ const Room = () => {
                             className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
                         >
                             <option value="0" disabled>Select the sport</option>
-                            <option value="Football">Football</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Tennis">Tennis</option>
+                            {sports.map((sport) => (
+                                <option key={sport.id} value={sport.name}>{sport.name}</option>
+                            ))}
                         </select>
+                        <input
+                            type="text"
+                            placeholder="Enter result 1"
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Enter result 2"
+                            className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
+                        />
                         <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
                             onClick={handleCreation}>
                             Confirm
