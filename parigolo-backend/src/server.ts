@@ -5,6 +5,7 @@ import Bet from "./models/bet";
 import Choice from "./models/choice";
 import Room from "./models/room";
 import Sport from "./models/sport";
+import Option from "./models/option";
 import { sequelize } from "./database";
 import cors from "cors";
 import PersonRoom from "./models/person-room";
@@ -26,6 +27,9 @@ Bet.belongsTo(Room);
 
 Bet.hasMany(Choice);
 Choice.belongsTo(Bet);
+
+Bet.hasMany(Option);
+Option.belongsTo(Bet);
 
 Choice.belongsToMany(Person, { through: ChoicePerson });
 Person.belongsToMany(Choice, { through: ChoicePerson });
@@ -363,6 +367,26 @@ app.get("/sports", async (req, res) => {
   try {
     const sports = await Sport.findAll();
     res.json(sports);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+app.post("/bets/:betId/options", async (req, res) => {
+  try {
+    const { betId } = req.params;
+    const option = await Option.create({ ...req.body, betId });
+    res.json(option);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+app.get("/bets/:betId/options", async (req, res) => {
+  try {
+    const { betId } = req.params;
+    const options = await Option.findAll({ where: { betId } });
+    res.json(options);
   } catch (err) {
     res.status(500).json({ error: err });
   }
