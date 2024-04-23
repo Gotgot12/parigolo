@@ -4,6 +4,7 @@ import Person from "./models/person";
 import Bet from "./models/bet";
 import Choice from "./models/choice";
 import Room from "./models/room";
+import Sport from "./models/sport";
 import { sequelize } from "./database";
 import cors from "cors";
 import PersonRoom from "./models/person-room";
@@ -357,6 +358,15 @@ type TempLeaderboard = {
   PersonId: number,
   RoomId: number
 }
+
+app.get("/sports", async (req, res) => {
+  try {
+    const sports = await Sport.findAll();
+    res.json(sports);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
 
 // Start the server
 const port = process.env.PORT ?? 8000;
