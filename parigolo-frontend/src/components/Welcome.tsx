@@ -87,6 +87,7 @@ const Welcome = () => {
                         pseudo: person?.pseudo,
                     } as Participant], ownerId: person?.id
                 } as Room]);
+                window.location.reload();
             })
             .catch((error) => console.log(error));
     };
@@ -117,6 +118,7 @@ const Welcome = () => {
             .then((response) => {
                 console.log(response);
                 setRooms(rooms?.filter(room => room.id !== id));
+                window.location.reload();
             })
             .catch((error) => console.log(error));
     }
