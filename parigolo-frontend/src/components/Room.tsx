@@ -11,6 +11,8 @@ type Bet = {
     isClosed: boolean;
     isEnded: boolean;
     RoomId: number;
+    option1: string;
+    option2: string;
 }
 
 type Room = {
@@ -52,6 +54,8 @@ const Room = () => {
 
     const [createdName, setCreatedName] = useState<string>("");
     const [createdSport, setCreatedSport] = useState<string>("0");
+    const [option1, setOption1] = useState<string>("");
+    const [option2, setOption2] = useState<string>("");
 
     const [addedBet, setAddedBet] = useState<string>("0")
     const [addedResults, setAddedResults] = useState<string>("")
@@ -144,7 +148,9 @@ const Room = () => {
             sport: createdSport,
             isClosed: false,
             isEnded: false,
-            RoomId: id
+            RoomId: id,
+            option1: option1,
+            option2: option2
         })
             .then((response) => {
                 setBets((previousBets) => [...previousBets, response.data])
@@ -221,11 +227,11 @@ const Room = () => {
             .catch((error) => console.log(error));
     }
 
-    const handlePrediction = () => {
+    const handleFastPrediction = (option: string, betID: number) => {
         axios.post(`/choices`, {
-            name: predictedResults,
+            name: option,
             isWin: false,
-            BetId: parseInt(predictedBet)
+            BetId: betID
         })
             .then((response) => {
                 console.log(response.data)
@@ -293,6 +299,14 @@ const Room = () => {
                                 )}
                             </ul>
                         </div>
+                        <div>
+                            <button className="w-full mt-4 p-2 bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white border border-blue-500 hover:border-transparent rounded-md"
+                                onClick={() => handleFastPrediction(bet.option1, bet.id)}
+                            >{bet.option1}</button>
+                            <button className="w-full mt-4 p-2 bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white border border-blue-500 hover:border-transparent rounded-md"
+                                onClick={() => handleFastPrediction(bet.option2, bet.id)}
+                            >{bet.option2}</button>
+                        </div>
                         {room?.ownerId === person?.id && (
                             <button className="w-full mt-4 p-2 bg-red-500 text-white rounded-md" onClick={(e) => {
                                 e.stopPropagation();
@@ -327,12 +341,16 @@ const Room = () => {
                         </select>
                         <input
                             type="text"
-                            placeholder="Enter result 1"
+                            value={option1}
+                            onChange={(e) => setOption1(e.target.value)}
+                            placeholder="Enter option 1"
                             className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
                         />
                         <input
                             type="text"
-                            placeholder="Enter result 2"
+                            value={option2}
+                            onChange={(e) => setOption2(e.target.value)}
+                            placeholder="Enter option 2"
                             className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
                         />
                         <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
@@ -361,36 +379,20 @@ const Room = () => {
                             placeholder="Enter the results"
                             className="w-full p-2 border border-gray-200 rounded-md mr-4"
                         />
+                        {/* <div>
+                            <button className="w-full mt-4 p-2 bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white border border-blue-500 hover:border-transparent rounded-md"
+                                onClick={() => console.log('Option 1 selected for bet')}
+                            >Option 1</button>
+                            <button className="w-full mt-4 p-2 bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white border border-blue-500 hover:border-transparent rounded-md"
+                                onClick={() => console.log('Option 2 selected for bet')}
+                            >Option 2</button>
+                        </div> */}
                         <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
                             onClick={handleAddition}>
                             Confirm
                         </button>
                     </div>
                 )}
-                <div className="bg-gray-100 p-4 rounded-md cursor-pointer">
-                    <h2 className="text-2xl font-bold mb-4">Give a prediction</h2>
-                    <select
-                        value={predictedBet}
-                        onChange={(e) => setPredictedBet(e.target.value)}
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4 mb-4"
-                    >
-                        <option key={0} value="0" disabled>Select the bet</option>
-                        {bets.map((bet) => (
-                            <option key={bet.id} value={bet.id}>{bet.name}</option>
-                        ))};
-                    </select>
-                    <input
-                        type="text"
-                        value={predictedResults}
-                        onChange={(e) => setPredictedResults(e.target.value)}
-                        placeholder="Enter the results"
-                        className="w-full p-2 border border-gray-200 rounded-md mr-4"
-                    />
-                    <button className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md"
-                        onClick={handlePrediction}>
-                        Confirm
-                    </button>
-                </div>
 
             </div>
         </div>
